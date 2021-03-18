@@ -75,10 +75,10 @@ SPATIALSIRENBASELINELB = {
 
 
 SPATIALSIRENBASELINELBSHIP = {
-    0: {'batch_size': 26 // 1, 'num_steps': 12, 'img_size': 32, 'batch_split': 1, 'gen_lr': 2e-5, 'disc_lr': 2e-4},
-    int(30e3): {'batch_size': 14 // 1, 'num_steps': 12, 'img_size': 64, 'batch_split': 2, 'gen_lr': 2e-5, 'disc_lr': 2e-4},
-    int(70e3): {'batch_size': 14 // 1, 'num_steps': 12, 'img_size': 64, 'batch_split': 2, 'gen_lr': 1e-5, 'disc_lr': 1e-4},
-    int(104e3): {'batch_size': 3 // 1, 'num_steps': 12, 'img_size': 128, 'batch_split': 2, 'gen_lr': 2e-6, 'disc_lr': 2e-5},
+    0: {'batch_size': 26 * 2, 'num_steps': 12, 'img_size': 32, 'batch_split': 1, 'gen_lr': 2e-5, 'disc_lr': 2e-4},
+    int(30e3): {'batch_size': 14 * 2, 'num_steps': 12, 'img_size': 64, 'batch_split': 2, 'gen_lr': 2e-5, 'disc_lr': 2e-4},
+    int(70e3): {'batch_size': 14 * 2, 'num_steps': 12, 'img_size': 64, 'batch_split': 2, 'gen_lr': 1e-5, 'disc_lr': 1e-4},
+    int(104e3): {'batch_size': 3 * 2, 'num_steps': 12, 'img_size': 128, 'batch_split': 2, 'gen_lr': 2e-6, 'disc_lr': 2e-5},
     int(200e3): {},
 
     'fov': 30,
