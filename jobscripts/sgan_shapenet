@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --time=47:30:00
+#SBATCH --time=71:30:00
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:v100:1
 #SBATCH --mem=32GB
@@ -11,4 +11,4 @@ ml Python/3.7.4-GCCcore-8.3.0
 
 source /data/s2576597/SGAN/venv/bin/activate
 
-CUDA_VISIBLE_DEVICES=0 python -u train.py --output_dir=/data/s2576597/SGAN/shapenetshiphalf --curriculum=SPATIALSIRENBASELINELBSHIPHALF
+CUDA_VISIBLE_DEVICES=0 python -u train.py --output_dir=/data/s2576597/SGAN/shapenetship --curriculum=SPATIALSIRENBASELINELBSHIP --load_dir=/data/s2576597/SGAN/shapenetship
