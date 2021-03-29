@@ -35,10 +35,10 @@ curriculum = {
     'psi':0.5,
     'ray_start':0.88,
     'ray_end':1.12,
-    'v_stddev': 0,
-    'h_stddev': 0,
-    'h_mean': 0 + math.pi/2,
-    'v_mean': 0 + math.pi/2,
+    'h_stddev': math.pi,
+    'v_stddev': math.pi*0.5,
+    'h_mean': math.pi,
+    'v_mean': 0,
     'fov': 12,
     'lock_view_dependence': opt.lock_view_dependence,
     'white_back':False,
@@ -71,14 +71,13 @@ for t in np.linspace(0, 1, curriculum['num_frames']):
     trajectory.append((pitch, yaw, fov))
 
 trajectory = []
-for pitch, yaw in zip(np.linspace(0, 2*math.pi, curriculum['num_frames']), np.linspace(-.5*math.pi, .5*math.pi, curriculum['num_frames'])):
+for pitch, yaw in zip(np.linspace(-.5*math.pi, .5*math.pi, curriculum['num_frames']), np.linspace(0, 2*math.pi, curriculum['num_frames'])):
     # pitch = 0.2 * np.cos(t * 2 * math.pi) + math.pi / 2
-    # yaw = 0.4 * np.sin(t * 2 * math.pi) + math.pi / 2
     fov = 12
 
     # fov = 12 + 5 + np.sin(t * 2 * math.pi) * 5
 
-    trajectory.append((pitch, yaw, fov))
+    trajectory.append((math.pi/4, yaw, fov))
 
 for p, y, fov in trajectory:
     print(math.degrees(p), math.degrees(y), fov)
@@ -103,9 +102,9 @@ for seed in opt.seeds:
             frame, depth_map = generator.staged_forward(z, max_batch_size=opt.max_batch_size, depth_map=opt.depth_map, **curriculum)
             frames.append(tensor_to_PIL(frame))
 
+        frames_per_frame = 9
         for frame in frames:
-            writer.writeFrame(np.array(frame))
-            writer.writeFrame(np.array(frame))
-            writer.writeFrame(np.array(frame))
+            for _ in range(frames_per_frame):
+                writer.writeFrame(np.array(frame))
 
         writer.close()
