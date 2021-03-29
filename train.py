@@ -300,7 +300,7 @@ def train(rank, world_size, opt):
                         with torch.cuda.amp.autocast():
                             copied_metadata = copy.deepcopy(metadata)
                             copied_metadata['h_stddev'] = copied_metadata['v_stddev'] = 0
-                            copied_metadata['h_mean'] += 0.5
+                            copied_metadata['h_mean'] += math.pi / 2
                             copied_metadata['img_size'] = 128
                             gen_imgs = generator_ddp.module.staged_forward(fixed_z.to(device),  **copied_metadata)[0]
                     save_image(gen_imgs[:25], os.path.join(opt.output_dir, f"{discriminator.step}_tilted.png"), nrow=5, normalize=True)
