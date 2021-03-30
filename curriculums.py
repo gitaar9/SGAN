@@ -116,20 +116,24 @@ SHIPSTANDARD = {
 }
 
 
-SPATIALSIRENBASELINELBSHIPHALF = {
-    0: {'batch_size': 26 * 2, 'num_steps': 12, 'img_size': 32, 'batch_split': 1, 'gen_lr': 1e-5, 'disc_lr': 1e-4},
-    int(30e3): {'batch_size': 14 * 2, 'num_steps': 12, 'img_size': 64, 'batch_split': 2, 'gen_lr': 1e-5, 'disc_lr': 1e-4},
-    int(70e3): {'batch_size': 14 * 2, 'num_steps': 12, 'img_size': 64, 'batch_split': 2, 'gen_lr': 2e-6, 'disc_lr': 2e-5},
-    int(104e3): {'batch_size': 3 * 2, 'num_steps': 12, 'img_size': 128, 'batch_split': 2, 'gen_lr': 1e-6, 'disc_lr': 1e-5},
-    int(200e3): {},
+SHIPSTANDARDBIGFOV = {
+    0: {'batch_size': 26 * 2, 'num_steps': 12, 'img_size': 32, 'batch_split': 1, 'gen_lr': 2e-5, 'disc_lr': 2e-4},
+    int(30e3): {'batch_size': 14 * 2, 'num_steps': 12, 'img_size': 64, 'batch_split': 2, 'gen_lr': 2e-5, 'disc_lr': 2e-4},
+    # int(70e3): {'batch_size': 14 * 2, 'num_steps': 12, 'img_size': 64, 'batch_split': 2, 'gen_lr': 1e-5, 'disc_lr': 1e-4},
+    int(104e3): {'batch_size': 3 * 2, 'num_steps': 12, 'img_size': 128, 'batch_split': 2, 'gen_lr': 2e-6, 'disc_lr': 2e-5},
+    int(200e3): {'batch_size': 3 * 2, 'num_steps': 12, 'img_size': 128, 'batch_split': 2, 'gen_lr': 1e-6, 'disc_lr': 1e-5},
+    # int(200e3): {},
 
-    'fov': 30,
-    'ray_start': 0.75,
-    'ray_end': 1.25,
+    # 'fov': 30,
+    # 'ray_start': 0.75,
+    # 'ray_end': 1.25,
+    'fov': 51,
+    'ray_start': 0.85,
+    'ray_end': 1.15,
     'fade_steps': 10000,
     'h_stddev': math.pi,
     'v_stddev': math.pi*0.5,
-    'h_mean': math.pi*0.5,
+    'h_mean': math.pi,
     'v_mean': math.pi*0.5,
     'sample_dist': 'uniform',
     'topk_interval': 2000,
@@ -150,4 +154,5 @@ SPATIALSIRENBASELINELBSHIPHALF = {
     'z_lambda': 0,
     'pos_lambda': 15.,
     'last_back': False,
+    'white_back': True
 }
