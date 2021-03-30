@@ -30,7 +30,7 @@ def setup_evaluation(dataset_name, generated_dir, target_size=128):
         os.makedirs(real_dir)
         dataloader, CHANNELS = datasets.get_dataset(dataset_name, img_size=target_size)
         print('outputting real images...')
-        output_real_images(dataloader, 8000, real_dir)
+        output_real_images(dataloader, 50, real_dir)
         print('...done')
 
     os.makedirs(generated_dir, exist_ok=True)
