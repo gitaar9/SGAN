@@ -112,6 +112,7 @@ SHIPSTANDARD = {
     'z_lambda': 0,
     'pos_lambda': 15.,
     'last_back': False,
+    'white_back': True
 }
 
 
