@@ -116,20 +116,21 @@ SHIPSTANDARD = {
 }
 
 
-SHIPSTANDARDBIGFOV = {
+SHIPSTANDARDBLACK = {
     0: {'batch_size': 26 * 2, 'num_steps': 12, 'img_size': 32, 'batch_split': 1, 'gen_lr': 2e-5, 'disc_lr': 2e-4},
     int(30e3): {'batch_size': 14 * 2, 'num_steps': 12, 'img_size': 64, 'batch_split': 2, 'gen_lr': 2e-5, 'disc_lr': 2e-4},
     # int(70e3): {'batch_size': 14 * 2, 'num_steps': 12, 'img_size': 64, 'batch_split': 2, 'gen_lr': 1e-5, 'disc_lr': 1e-4},
     int(104e3): {'batch_size': 3 * 2, 'num_steps': 12, 'img_size': 128, 'batch_split': 2, 'gen_lr': 2e-6, 'disc_lr': 2e-5},
-    int(200e3): {'batch_size': 3 * 2, 'num_steps': 12, 'img_size': 128, 'batch_split': 2, 'gen_lr': 1e-6, 'disc_lr': 1e-5},
+    int(200e3): {'batch_size': 6 * 2, 'num_steps': 12, 'img_size': 128, 'batch_split': 2, 'gen_lr': 1e-6, 'disc_lr': 1e-5},
+    int(300e3): {'batch_size': 3 * 2, 'num_steps': 12, 'img_size': 256, 'batch_split': 2, 'gen_lr': 1e-6, 'disc_lr': 2e-5},
     # int(200e3): {},
 
     # 'fov': 30,
     # 'ray_start': 0.75,
     # 'ray_end': 1.25,
-    'fov': 51,
-    'ray_start': 0.85,
-    'ray_end': 1.15,
+    'fov': 12,
+    'ray_start': 0.88,
+    'ray_end': 1.12,
     'fade_steps': 10000,
     'h_stddev': math.pi,
     'v_stddev': math.pi*0.5,
@@ -147,12 +148,12 @@ SHIPSTANDARDBIGFOV = {
     'model': 'SPATIALSIRENBASELINE',
     'generator': 'ImplicitGenerator3d',
     'discriminator': 'ProgressiveEncoderDiscriminator',
-    'dataset': 'ShapenetShips',
+    'dataset': 'ShapenetShipsBlack',
     'clamp_mode': 'relu',
     'z_dist': 'gaussian',
     'hierarchical_sample': True,
     'z_lambda': 0,
     'pos_lambda': 15.,
     'last_back': False,
-    'white_back': True
+    'white_back': False
 }

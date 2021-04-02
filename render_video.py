@@ -71,13 +71,13 @@ for t in np.linspace(0, 1, curriculum['num_frames']):
     trajectory.append((pitch, yaw, fov))
 
 trajectory = []
-for pitch, yaw in zip(np.linspace(-.5*math.pi, .5*math.pi, curriculum['num_frames']), np.linspace(0, 2*math.pi, curriculum['num_frames'])):
+for pitch, yaw in zip(np.linspace(0, math.pi, curriculum['num_frames']), np.linspace(0, 2*math.pi, curriculum['num_frames'])):
     # pitch = 0.2 * np.cos(t * 2 * math.pi) + math.pi / 2
     fov = 12
 
     # fov = 12 + 5 + np.sin(t * 2 * math.pi) * 5
 
-    trajectory.append((math.pi/4, yaw, fov))
+    trajectory.append((pitch, yaw, fov))
 
 for p, y, fov in trajectory:
     print(math.degrees(p), math.degrees(y), fov)
