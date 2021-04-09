@@ -174,7 +174,7 @@ CARLA_LOW_BATCH_SIZE = {
     'weight_decay': 0,
     'r1_lambda': 1,
     'latent_dim': 256,
-    'grad_clip': 1,
+    'grad_clip': .3,
     'model': 'TALLSIREN',
     'generator': 'ImplicitGenerator3d',
     'discriminator': 'ProgressiveEncoderDiscriminator',
