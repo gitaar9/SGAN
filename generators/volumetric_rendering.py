@@ -139,6 +139,10 @@ def sample_camera_positions(device, n=1, r=1, horizontal_stddev=1, vertical_stdd
         else:
             theta = torch.randn((n, 1), device=device) * horizontal_stddev + horizontal_mean
             phi = torch.randn((n, 1), device=device) * vertical_stddev + vertical_mean
+    elif mode == 'spherical_uniform':
+        # std and mean will be ignored, so the elevation will always be between 0-pi and the azimuth between 0-2pi
+        theta = torch.randn((n, 1), device=device) * 2 * math.pi
+        phi = torch.acos(1 - 2 * torch.randn((n, 1), device=device))
     else:
         phi = torch.ones((n, 1), device=device, dtype=torch.float) * vertical_mean
         theta = torch.ones((n, 1), device=device, dtype=torch.float) * horizontal_mean
