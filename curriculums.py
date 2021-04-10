@@ -36,10 +36,10 @@ def extract_metadata(curriculum, current_step):
     return return_dict
 
 CARLA = {
-    0: {'batch_size': 60, 'num_steps': 48, 'img_size': 32, 'batch_split': 1, 'gen_lr': 4e-5, 'disc_lr': 4e-4},
-    int(30e3): {'batch_size': 28, 'num_steps': 48, 'img_size': 64, 'batch_split': 2, 'gen_lr': 2e-5, 'disc_lr': 2e-4},
-    int(75e3): {'batch_size': 12, 'num_steps': 64, 'img_size': 128, 'batch_split': 5, 'gen_lr': 10e-6,
-                'disc_lr': 10e-5},
+    0: {'batch_size': 30, 'num_steps': 48, 'img_size': 32, 'batch_split': 1, 'gen_lr': 2e-5, 'disc_lr': 2e-4},
+    int(30e3): {'batch_size': 14, 'num_steps': 48, 'img_size': 64, 'batch_split': 2, 'gen_lr': 1e-5, 'disc_lr': 1e-4},
+    int(75e3): {'batch_size': 6, 'num_steps': 64, 'img_size': 128, 'batch_split': 5, 'gen_lr': 5e-6,
+                'disc_lr': 5e-5},
     #int(200e3): {},
 
     'fov': 30,
