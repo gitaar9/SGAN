@@ -62,6 +62,22 @@ class ShapenetShipsBlack(CelebA):
 
         return X, 0
 
+
+class CARLA(CelebA):
+    def __init__(self, img_size, **kwargs):
+        super().__init__(img_size)
+
+        #self.data = glob.glob('/home/gitaar9/AI/TNO/shapenet_renderer/ship_renders/*/*/rgb/*.png')
+        self.data = glob.glob('/data/s2576597/graf_datasets/carla/*.png')
+        self.transform = transforms.Compose(
+                    [transforms.Resize(256), transforms.CenterCrop(256), transforms.ToTensor(), transforms.Normalize([0.5], [0.5]), transforms.RandomHorizontalFlip(p=0.5), transforms.Resize((img_size, img_size), interpolation=0)])
+
+    def __getitem__(self, index):
+        X = PIL.Image.open(self.data[index]).convert('RGB')
+        X = self.transform(X)
+
+        return X, 0
+
 def get_dataset(name, subsample=None, batch_size=1, **kwargs):
     dataset = globals()[name](**kwargs)
 
