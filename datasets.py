@@ -71,6 +71,7 @@ class CARLA(CelebA):
         self.data = glob.glob('/data/s2576597/graf_datasets/carla/*.png')
         self.transform = transforms.Compose(
                     [transforms.Resize(256), transforms.CenterCrop(256), transforms.ToTensor(), transforms.Normalize([0.5], [0.5]), transforms.RandomHorizontalFlip(p=0.5), transforms.Resize((img_size, img_size), interpolation=0)])
+        print("DATASET SIZE: ", len(self.data))
 
     def __getitem__(self, index):
         X = PIL.Image.open(self.data[index]).convert('RGB')
