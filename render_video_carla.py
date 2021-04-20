@@ -12,6 +12,7 @@ import numpy as np
 import skvideo.io
 import curriculums
 
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 parser = argparse.ArgumentParser()
@@ -29,19 +30,19 @@ opt = parser.parse_args()
 os.makedirs(opt.output_dir, exist_ok=True)
 
 curriculum = {
-    'num_steps':128,
-    'img_size':opt.image_size,
-    'hierarchical_sample':False,
-    'psi':0.7,
-    'ray_start':0.75,
-    'ray_end':1.25,
+    'num_steps': 128,
+    'img_size': opt.image_size,
+    'hierarchical_sample': False,
+    'psi': 0.7,
+    'ray_start': 0.75,
+    'ray_end': 1.25,
     'v_stddev': 0,
     'h_stddev': 0,
     'h_mean': 0 + math.pi/2,
     'v_mean': 0 + math.pi/2,
     'fov': 30,
     'lock_view_dependence': opt.lock_view_dependence,
-    'white_back':True,
+    'white_back': True,
     'last_back': False,
     'clamp_mode': 'relu',
     'nerf_noise': 0,
@@ -53,6 +54,7 @@ def tensor_to_PIL(img):
     img = img.squeeze() * 0.5 + 0.5
     return Image.fromarray(img.mul(255).add_(0.5).clamp_(0, 255).permute(1, 2, 0).to('cpu', torch.uint8).numpy())
 
+
 generator = torch.load(opt.path, map_location=torch.device(device))
 ema_file = opt.path.split('generator')[0] + 'ema.pth'
 ema = torch.load(ema_file)
@@ -62,13 +64,15 @@ generator.eval()
 
 trajectory = []
 for t in np.linspace(0, 1, curriculum['num_frames']):
-#     pitch = 0.2 * np.cos(t * 2 * math.pi) + math.pi/2
-#     yaw = 0.4 * np.sin(t * 2 * math.pi) + math.pi/2
+    # pitch = 0.2 * np.cos(t * 2 * math.pi) + math.pi/2  # these dont work
+    # yaw = 0.4 * np.sin(t * 2 * math.pi) + math.pi/2
     pitch = math.pi/2 * (1 - t)
     yaw = 2 * math.pi * t
     fov = 30
         
     trajectory.append((pitch, yaw, fov))
+
+frame_repeat = 5
 
 for seed in opt.seeds:
     frames = []
@@ -91,6 +95,7 @@ for seed in opt.seeds:
             frames.append(tensor_to_PIL(frame))
 
         for frame in frames:
-            writer.writeFrame(np.array(frame))
+            for _ in range(frame_repeat):
+                writer.writeFrame(np.array(frame))
 
         writer.close()
