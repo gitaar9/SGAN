@@ -11,4 +11,4 @@ ml Python/3.7.4-GCCcore-8.3.0
 
 source /data/s2576597/SGAN/venv/bin/activate
 
-CUDA_VISIBLE_DEVICES=0 python -u train.py --output_dir=/data/s2576597/SGAN/carla_for_shapenetships --curriculum=CARLAFORSHAPENETSHIPS
+CUDA_VISIBLE_DEVICES=0 python -u train.py --output_dir=/data/s2576597/SGAN/carla_for_shapenetships --curriculum=CARLAFORSHAPENETSHIPS --load_dir=/data/s2576597/SGAN/carla_for_shapenetships
