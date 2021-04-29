@@ -88,7 +88,7 @@ def train(rank, world_size, opt):
         ema2 = ExponentialMovingAverage(generator.parameters(), decay=0.9999)
 
     for name, param in generator.named_parameters():
-            print(name, param.data())
+            print(name, param.data, param.requires_grad)
     if opt.freeze_siren_weights:
         generator.siren.freeze_linear_layers()
     print('AFTER!!:')
