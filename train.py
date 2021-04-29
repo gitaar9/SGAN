@@ -87,12 +87,13 @@ def train(rank, world_size, opt):
         ema = ExponentialMovingAverage(generator.parameters(), decay=0.999)
         ema2 = ExponentialMovingAverage(generator.parameters(), decay=0.9999)
 
+    if opt.freeze_siren_weights:
+        generator.siren.freeze_linear_layers()
+
     generator_ddp = DDP(generator, device_ids=[rank], find_unused_parameters=True)
     discriminator_ddp = DDP(discriminator, device_ids=[rank], find_unused_parameters=True, broadcast_buffers=False)
     generator = generator_ddp.module
     discriminator = discriminator_ddp.module
-
-
 
     if metadata.get('unique_lr', False):
         mapping_network_param_names = [name for name, _ in generator_ddp.module.siren.mapping_network.named_parameters()]
@@ -349,6 +350,7 @@ if __name__ == '__main__':
     parser.add_argument('--port', type=str, default='12355')
     parser.add_argument('--set_step', type=int, default=None)
     parser.add_argument('--model_save_interval', type=int, default=1500)
+    parser.add_argument('--freeze_siren_weights', action='store_true', default=False)
 
     opt = parser.parse_args()
     print(opt)

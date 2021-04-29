@@ -32,10 +32,10 @@ os.makedirs(opt.output_dir, exist_ok=True)
 curriculum = {
     'num_steps': 128,
     'img_size': opt.image_size,
-    'hierarchical_sample': False,
+    'hierarchical_sample': True,
     'psi': 0.7,
-    'ray_start': 0.75,
-    'ray_end': 1.25,
+    'ray_start': .1,  # 0.75,
+    'ray_end': 1.9,  # 1.25,
     'v_stddev': 0,
     'h_stddev': 0,
     'h_mean': 0 + math.pi/2,

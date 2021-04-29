@@ -49,11 +49,10 @@ def kaiming_leaky_init(m):
     if classname.find('Linear') != -1:
         torch.nn.init.kaiming_normal_(m.weight, a=0.2, mode='fan_in', nonlinearity='leaky_relu')
 
+
 class CustomMappingNetwork(nn.Module):
     def __init__(self, z_dim, map_hidden_dim, map_output_dim):
         super().__init__()
-
-
 
         self.network = nn.Sequential(nn.Linear(z_dim, map_hidden_dim),
                                      nn.LeakyReLU(0.2, inplace=True),
@@ -86,6 +85,7 @@ def frequency_init(freq):
                 num_input = m.weight.size(-1)
                 m.weight.uniform_(-np.sqrt(6 / num_input) / freq, np.sqrt(6 / num_input) / freq)
     return init
+
 
 class FiLMLayer(nn.Module):
     def __init__(self, input_dim, hidden_dim):
@@ -151,6 +151,12 @@ class TALLSIREN(nn.Module):
 
         return torch.cat([rbg, sigma], dim=-1)
 
+    def freeze_linear_layers(self):
+        for idx in range(len(self.network)):
+            film_layer = self.network[idx]
+            film_layer.layer.weight.requires_grad = False
+            film_layer.layer.bias.requires_grad = False
+
 
 class UniformBoxWarp(nn.Module):
     def __init__(self, sidelength):
@@ -159,6 +165,7 @@ class UniformBoxWarp(nn.Module):
         
     def forward(self, coordinates):
         return coordinates * self.scale_factor
+
 
 class SPATIALSIRENBASELINE(nn.Module):
     def __init__(self, input_dim=2, z_dim=100, hidden_dim=256, output_dim=1, device=None):
@@ -184,7 +191,7 @@ class SPATIALSIRENBASELINE(nn.Module):
         self.color_layer_sine = FiLMLayer(hidden_dim + 3, hidden_dim)
         self.color_layer_linear = nn.Sequential(nn.Linear(hidden_dim, 3))
         
-        self.mapping_network = CustomMappingNetwork(z_dim, 256, (len(self.network) + 1)*hidden_dim*2)
+        self.mapping_network = CustomMappingNetwork(z_dim, 256, (len(self.network) + 1) * hidden_dim * 2)
         
         self.network.apply(frequency_init(25))
         self.final_layer.apply(frequency_init(25))
