@@ -87,8 +87,14 @@ def train(rank, world_size, opt):
         ema = ExponentialMovingAverage(generator.parameters(), decay=0.999)
         ema2 = ExponentialMovingAverage(generator.parameters(), decay=0.9999)
 
+    for name, param in generator.named_parameters():
+            print(name, param.data())
     if opt.freeze_siren_weights:
         generator.siren.freeze_linear_layers()
+    print('AFTER!!:')
+    for name, param in generator.named_parameters():
+            print(name, param.data())
+
 
     generator_ddp = DDP(generator, device_ids=[rank], find_unused_parameters=True)
     discriminator_ddp = DDP(discriminator, device_ids=[rank], find_unused_parameters=True, broadcast_buffers=False)
