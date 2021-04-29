@@ -104,7 +104,7 @@ def train(rank, world_size, opt):
 
     print('AFTER!!:')
     for name, param in generator.named_parameters():
-            print(name, param.data)
+            print(name, param.data, param.requires_grad)
 
 
     generator_ddp = DDP(generator, device_ids=[rank], find_unused_parameters=True)
@@ -302,7 +302,7 @@ def train(rank, world_size, opt):
 
             if rank == 0:
                 # interior_step_bar.update(1)
-                if i % 10 == 0:
+                if i % 10 == 1:
                     tqdm.write(f"[Experiment: {opt.output_dir}] [GPU: {os.environ['CUDA_VISIBLE_DEVICES']}] [Epoch: {discriminator.epoch}/{opt.n_epochs}] [D loss: {d_loss.item()}] [G loss: {g_loss.item()}] [Step: {discriminator.step}] [Alpha: {alpha:.2f}] [Img Size: {metadata['img_size']}] [Batch Size: {metadata['batch_size']}] [TopK: {topk_num}] [Scale: {scaler.get_scale()}]")
 
                 if discriminator.step % opt.sample_interval == 0:
