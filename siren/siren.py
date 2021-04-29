@@ -156,6 +156,8 @@ class TALLSIREN(nn.Module):
             film_layer = self.network[idx]
             film_layer.layer.weight.requires_grad = False
             film_layer.layer.bias.requires_grad = False
+        self.color_layer_sine.layer.weight.requires_grad = False
+        self.color_layer_sine.layer.bias.requires_grad = False
 
 
 class UniformBoxWarp(nn.Module):

@@ -89,11 +89,22 @@ def train(rank, world_size, opt):
 
     for name, param in generator.named_parameters():
             print(name, param.data, param.requires_grad)
+
     if opt.freeze_siren_weights:
         generator.siren.freeze_linear_layers()
+        # Remove the paramaters that don't require grad anymore from the ema
+        new_ema_params = []
+        new_ema2_params = []
+        for old_ema_p, old_ema2_p, new_p in zip(ema.shadow_params, ema2.shadow_params, generator.parameters()):
+            if new_p.requires_grad:
+                new_ema_params.append(old_ema_p)
+                new_ema2_params.append(old_ema2_p)
+        ema.shadow_params = new_ema_params
+        ema2.shadow_params = new_ema2_params
+
     print('AFTER!!:')
     for name, param in generator.named_parameters():
-            print(name, param.data())
+            print(name, param.data)
 
 
     generator_ddp = DDP(generator, device_ids=[rank], find_unused_parameters=True)
