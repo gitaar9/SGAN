@@ -299,12 +299,16 @@ def train(rank, world_size, opt):
             ema.update(generator_ddp.parameters())
             ema2.update(generator_ddp.parameters())
 
-
             if rank == 0:
-                interior_step_bar.update(1)
+                try:
+                    interior_step_bar.update(1)
+                except Exception as e:
+                    print('Error from interior_step_bar.update at line 304', e)
                 if i % 10 == 0:
-                    tqdm.write(f"[Experiment: {opt.output_dir}] [GPU: {os.environ['CUDA_VISIBLE_DEVICES']}] [Epoch: {discriminator.epoch}/{opt.n_epochs}] [D loss: {d_loss.item()}] [G loss: {g_loss.item()}] [Step: {discriminator.step}] [Alpha: {alpha:.2f}] [Img Size: {metadata['img_size']}] [Batch Size: {metadata['batch_size']}] [TopK: {topk_num}] [Scale: {scaler.get_scale()}]")
-
+                    try:
+                        tqdm.write(f"[Experiment: {opt.output_dir}] [GPU: {os.environ['CUDA_VISIBLE_DEVICES']}] [Epoch: {discriminator.epoch}/{opt.n_epochs}] [D loss: {d_loss.item()}] [G loss: {g_loss.item()}] [Step: {discriminator.step}] [Alpha: {alpha:.2f}] [Img Size: {metadata['img_size']}] [Batch Size: {metadata['batch_size']}] [TopK: {topk_num}] [Scale: {scaler.get_scale()}]")
+                    except OverflowError:
+                        print("Overflow error from line 307 in train.py")
                 if discriminator.step % opt.sample_interval == 0:
                     with torch.no_grad():
                         with torch.cuda.amp.autocast():
