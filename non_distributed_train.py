@@ -7,11 +7,8 @@ from collections import deque
 
 
 import torch
-import torch.distributed as dist
-import torch.multiprocessing as mp
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.nn.parallel import DistributedDataParallel as DDP
 from torchvision.utils import save_image
 
 
@@ -27,6 +24,7 @@ from datetime import datetime
 import copy
 
 from torch_ema import ExponentialMovingAverage
+
 
 def load_images(images, curriculum, device):
     return_images = []
@@ -269,15 +267,15 @@ def train(opt):
             ema.update(generator.parameters())
             ema2.update(generator.parameters())
 
-            try:
-                interior_step_bar.update(1)
-            except Exception as e:
-                print('Error from interior_step_bar.update at line 304', e)
-            if i % 10 == 0:
-                try:
-                    tqdm.write(f"[Experiment: {opt.output_dir}] [GPU: {os.environ['CUDA_VISIBLE_DEVICES']}] [Epoch: {discriminator.epoch}/{opt.n_epochs}] [D loss: {d_loss.item()}] [G loss: {g_loss.item()}] [Step: {discriminator.step}] [Alpha: {alpha:.2f}] [Img Size: {metadata['img_size']}] [Batch Size: {metadata['batch_size']}] [TopK: {topk_num}] [Scale: {scaler.get_scale()}]")
-                except OverflowError:
-                    print("Overflow error from line 307 in train.py")
+            # try:
+            #     interior_step_bar.update(1)
+            # except Exception as e:
+            #     print('Error from interior_step_bar.update at line 304', e)
+            # if i % 10 == 0:
+            #     try:
+            #         tqdm.write(f"[Experiment: {opt.output_dir}] [GPU: {os.environ['CUDA_VISIBLE_DEVICES']}] [Epoch: {discriminator.epoch}/{opt.n_epochs}] [D loss: {d_loss.item()}] [G loss: {g_loss.item()}] [Step: {discriminator.step}] [Alpha: {alpha:.2f}] [Img Size: {metadata['img_size']}] [Batch Size: {metadata['batch_size']}] [TopK: {topk_num}] [Scale: {scaler.get_scale()}]")
+            #     except OverflowError:
+            #         print("Overflow error from line 307 in train.py")
             if discriminator.step % opt.sample_interval == 0:
                 with torch.no_grad():
                     with torch.cuda.amp.autocast():
@@ -311,9 +309,7 @@ def train(opt):
                 generated_dir = os.path.join(opt.output_dir, 'evaluation/generated')
 
                 fid_evaluation.setup_evaluation(metadata['dataset'], generated_dir, target_size=128)
-                dist.barrier()
                 fid_evaluation.output_images(generator, metadata, 0, 1, generated_dir)
-                dist.barrier()
                 fid = fid_evaluation.calculate_fid(metadata['dataset'], generated_dir, target_size=128)
                 with open(os.path.join(opt.output_dir, f'fid.txt'), 'a') as f:
                     f.write(f'\n{discriminator.step}:{fid}')
