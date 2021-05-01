@@ -222,7 +222,7 @@ SPATIALSIRENBASELINELB = {
 }
 
 PEREGRINETESTCURRICULUM = {
-    0: {'batch_size': 4, 'num_steps': 48, 'img_size': 32, 'batch_split': 1, 'gen_lr': 4e-5, 'disc_lr': 4e-4},
+    0: {'batch_size': 16, 'num_steps': 48, 'img_size': 32, 'batch_split': 2, 'gen_lr': 4e-5, 'disc_lr': 4e-4},
 
     'fov': 30,
     'ray_start': 0.75,
