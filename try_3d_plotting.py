@@ -65,6 +65,19 @@ def fancy_plotting(generator, z, device, metadata):
     plt.show()
 
 
+def invert_point_tensor(point_tensor):
+    # Old implementation
+    # point_tensor_numpy = point_tensor.cpu().detach().numpy().squeeze()
+    # inverse_point_tensor_numpy = point_tensor_numpy.copy()
+    # old_x = inverse_point_tensor_numpy[:, 0].copy()
+    # inverse_point_tensor_numpy[:, 0] = inverse_point_tensor_numpy[:, 2].copy()
+    # inverse_point_tensor_numpy[:, 2] = old_x
+    # inverse_point_tensor = torch.from_numpy(inverse_point_tensor_numpy).unsqueeze(0).float().to(device)
+
+    # Swaps x and z axis
+    return point_tensor[:, :, [2, 1, 0]]
+
+
 def mirror_experiment(generator, z, device, **metadata):
     transformed_points, transformed_ray_directions_expanded, camera_origin, z_vals = sample_points_as_in_generator(**metadata, device=device)
 
@@ -73,39 +86,36 @@ def mirror_experiment(generator, z, device, **metadata):
             # Normal render
             course_output = query_siren_as_in_generator(generator, transformed_points, transformed_ray_directions_expanded, z, device, **metadata)
             show_siren_output_as_image(course_output, z_vals, device, **metadata)
+
             # Inverse render
-
             # Switch x and z axis for points
-            transformed_points_numpy = transformed_points.cpu().detach().numpy().squeeze()
-            inverse_transformed_points_numpy = transformed_points_numpy.copy()
-            old_x = inverse_transformed_points_numpy[:, 0].copy()
-            inverse_transformed_points_numpy[:, 0] = inverse_transformed_points_numpy[:, 2].copy()
-            inverse_transformed_points_numpy[:, 2] = old_x
-            inverse_transformed_points = torch.from_numpy(inverse_transformed_points_numpy).unsqueeze(0).float().to(device)
+            inverse_transformed_points = invert_point_tensor(transformed_points)
             # Switch x and z axis for directions
-            transformed_ray_directions_expanded_numpy = transformed_ray_directions_expanded.cpu().detach().numpy().squeeze()
-            inverse_transformed_ray_directions_expanded_numpy = transformed_ray_directions_expanded_numpy.copy()
-            old_x = inverse_transformed_ray_directions_expanded_numpy[:, 0].copy()
-            inverse_transformed_ray_directions_expanded_numpy[:, 0] = inverse_transformed_ray_directions_expanded_numpy[:, 2].copy()
-            inverse_transformed_ray_directions_expanded_numpy[:, 2] = old_x
-            inverse_transformed_ray_directions_expanded = torch.from_numpy(inverse_transformed_ray_directions_expanded_numpy).unsqueeze(0).float().to(device)
+            inverse_transformed_ray_directions_expanded = invert_point_tensor(transformed_ray_directions_expanded)
             course_output = query_siren_as_in_generator(generator, inverse_transformed_points, inverse_transformed_ray_directions_expanded, z, device, **metadata)
+            show_siren_output_as_image(course_output, z_vals, device, tag=True, **metadata)
 
-    print(transformed_points.shape, inverse_transformed_points.shape)
-
-    camera_origin = camera_origin.cpu().detach().numpy().squeeze()
-
+    # Show original points and camera position
+    # yaw = math.atan2(camera_origin[2], camera_origin[0])
+    yaw = torch.atan2(camera_origin[:, 2], camera_origin[:, 0])
+    inverse_yaw = torch.atan2(camera_origin[:, 0], camera_origin[:, 2])
+    yaw = yaw.cpu().detach().numpy().squeeze()
+    inverse_yaw = inverse_yaw.cpu().detach().numpy().squeeze()
+    print("Original yaw: ", math.degrees(yaw), yaw)
+    print("Inverse yaw: ", math.degrees(inverse_yaw), inverse_yaw)
     plt.figure(1, (8, 8))
+    transformed_points_numpy = transformed_points.cpu().detach().numpy().squeeze()
     fancy_plot(generator, z, device, transformed_points_numpy, camera_origin)
 
-    # Show inverted img
+    # Show inverted points and camera position
     plt.figure(2, (8, 8))
-    show_siren_output_as_image(course_output, z_vals, device, tag=True, **metadata)
-    fancy_plot(generator, z, device, inverse_transformed_points_numpy, camera_origin)
+    camera_origin = camera_origin.cpu().detach().numpy().squeeze()
+    inverse_camera_origin = np.asarray([camera_origin[2], camera_origin[1], camera_origin[0]])
+    inverse_yaw = math.atan2(inverse_camera_origin[2], inverse_camera_origin[0])
+    print("Inverse yaw: ", math.degrees(inverse_yaw), inverse_yaw)
+    inverse_transformed_points_numpy = inverse_transformed_points.cpu().detach().numpy().squeeze()
+    fancy_plot(generator, z, device, inverse_transformed_points_numpy, inverse_camera_origin)
     plt.show()
-    # plot_3d_points(transformed_points_numpy, extra_point=camera_origin)
-    #
-    # plot_3d_points(transformed_points_numpy, extra_point=camera_origin)
 
 
 def show_siren_output_as_image(siren_output, z_vals, device, img_size, tag=False, **kwargs):
@@ -175,6 +185,7 @@ def sample_points_as_in_generator(img_size, fov, ray_start, ray_end, num_steps, 
     transformed_ray_directions_expanded = transformed_ray_directions_expanded.reshape(batch_size,
                                                                                       img_size * img_size * num_steps,
                                                                                       3)
+    print("Yaw: ", math.degrees(yaw[0][0]), " Pitch: ", math.degrees(pitch[0][0]))
     return transformed_points, transformed_ray_directions_expanded, camera_origin, z_vals
 
 
@@ -369,7 +380,6 @@ def train(opt):
     query_uniformly_sampled_points(generator, z, device)
     # Fancy plotting
     fancy_plotting(generator, z, device, metadata)
-
 
 
 if __name__ == '__main__':

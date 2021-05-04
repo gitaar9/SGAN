@@ -30,12 +30,12 @@ class ImplicitGenerator3d(nn.Module):
 
         with torch.no_grad():
             points_cam, z_vals, rays_d_cam = get_initial_rays_trig(batch_size, num_steps, resolution=(img_size, img_size), device=self.device, fov=fov, ray_start=ray_start, ray_end=ray_end) # batch_size, pixels, num_steps, 1
-            transformed_points, z_vals, transformed_ray_directions, transformed_ray_origins, pitch, yaw = transform_sampled_points(points_cam, z_vals, rays_d_cam, h_stddev=h_stddev, v_stddev=v_stddev, h_mean=h_mean, v_mean=v_mean, device=self.device, mode=sample_dist)
+            transformed_points, z_vals, transformed_ray_directions, transformed_ray_origins, pitch, yaw, _ = transform_sampled_points(points_cam, z_vals, rays_d_cam, h_stddev=h_stddev, v_stddev=v_stddev, h_mean=h_mean, v_mean=v_mean, device=self.device, mode=sample_dist)
 
 
             transformed_ray_directions_expanded = torch.unsqueeze(transformed_ray_directions, -2)
             transformed_ray_directions_expanded = transformed_ray_directions_expanded.expand(-1, -1, num_steps, -1)
-            transformed_ray_directions_expanded = transformed_ray_directions_expanded.reshape(batch_size, img_size*img_size*num_steps, 3)
+            transformed_ray_directions_expanded = transformed_ray_directions_expanded.reshape(batch_size, img_size * img_size * num_steps, 3)
             transformed_points = transformed_points.reshape(batch_size, img_size*img_size*num_steps, 3)
 
             if lock_view_dependence:
@@ -100,7 +100,7 @@ class ImplicitGenerator3d(nn.Module):
 
         with torch.no_grad():
             points_cam, z_vals, rays_d_cam = get_initial_rays_trig(batch_size, num_steps, resolution=(img_size, img_size), device=self.device, fov=fov, ray_start=ray_start, ray_end=ray_end) # batch_size, pixels, num_steps, 1
-            transformed_points, z_vals, transformed_ray_directions, transformed_ray_origins, pitch, yaw = transform_sampled_points(points_cam, z_vals, rays_d_cam, h_stddev=h_stddev, v_stddev=v_stddev, h_mean=h_mean, v_mean=v_mean, device=self.device, mode=sample_dist)
+            transformed_points, z_vals, transformed_ray_directions, transformed_ray_origins, pitch, yaw, _ = transform_sampled_points(points_cam, z_vals, rays_d_cam, h_stddev=h_stddev, v_stddev=v_stddev, h_mean=h_mean, v_mean=v_mean, device=self.device, mode=sample_dist)
 
             transformed_ray_directions_expanded = torch.unsqueeze(transformed_ray_directions, -2)
             transformed_ray_directions_expanded = transformed_ray_directions_expanded.expand(-1, -1, num_steps, -1)
@@ -170,17 +170,22 @@ class ImplicitGenerator3d(nn.Module):
             truncated_phase_shifts = self.avg_phase_shifts + psi * (raw_phase_shifts - self.avg_phase_shifts)
 
             points_cam, z_vals, rays_d_cam = get_initial_rays_trig(batch_size, num_steps, resolution=(img_size, img_size), device=self.device, fov=fov, ray_start=ray_start, ray_end=ray_end) # batch_size, pixels, num_steps, 1
-            transformed_points, z_vals, transformed_ray_directions, transformed_ray_origins, pitch, yaw = transform_sampled_points(points_cam, z_vals, rays_d_cam, h_stddev=h_stddev, v_stddev=v_stddev, h_mean=h_mean, v_mean=v_mean, device=self.device, mode=sample_dist)
+            transformed_points, z_vals, transformed_ray_directions, transformed_ray_origins, pitch, yaw, _ = transform_sampled_points(points_cam, z_vals, rays_d_cam, h_stddev=h_stddev, v_stddev=v_stddev, h_mean=h_mean, v_mean=v_mean, device=self.device, mode=sample_dist)
 
             transformed_ray_directions_expanded = torch.unsqueeze(transformed_ray_directions, -2)
             transformed_ray_directions_expanded = transformed_ray_directions_expanded.expand(-1, -1, num_steps, -1)
             transformed_ray_directions_expanded = transformed_ray_directions_expanded.reshape(batch_size, img_size*img_size*num_steps, 3)
             transformed_points = transformed_points.reshape(batch_size, img_size*img_size*num_steps, 3)
 
+
             if lock_view_dependence:
                 transformed_ray_directions_expanded = torch.zeros_like(transformed_ray_directions_expanded)
                 transformed_ray_directions_expanded[..., -1] = -1
 
+
+            # print("Transformed points ", torch.min(transformed_points), torch.max(transformed_points), transformed_points.shape, torch.mean(transformed_points, 2, True))
+            # print("transformed_ray_directions_expanded ", torch.min(transformed_ray_directions_expanded), torch.max(transformed_ray_directions_expanded), transformed_ray_directions_expanded.shape)
+            # print("z_vals ", z_vals.shape)
             # BATCHED SAMPLE
             coarse_output = torch.zeros((batch_size, transformed_points.shape[1], 4), device=self.device)
             for b in range(batch_size):
@@ -199,11 +204,11 @@ class ImplicitGenerator3d(nn.Module):
                     _, _, weights = fancy_integration(coarse_output, z_vals, device=self.device, clamp_mode=kwargs['clamp_mode'], noise_std=kwargs['nerf_noise'])
 
                     weights = weights.reshape(batch_size * img_size * img_size, num_steps) + 1e-5
-                    z_vals = z_vals.reshape(batch_size * img_size * img_size, num_steps) # We squash the dimensions here. This means we importance sample for every batch for every ray
-                    z_vals_mid = 0.5 * (z_vals[: ,:-1] + z_vals[: ,1:]) # (N_rays, N_samples-1) interval mid points
+                    z_vals = z_vals.reshape(batch_size * img_size * img_size, num_steps)  # We squash the dimensions here. This means we importance sample for every batch for every ray
+                    z_vals_mid = 0.5 * (z_vals[:, :-1] + z_vals[:, 1:])  # (N_rays, N_samples-1) interval mid points
                     z_vals = z_vals.reshape(batch_size, img_size * img_size, num_steps, 1)
                     fine_z_vals = sample_pdf(z_vals_mid, weights[:, 1:-1],
-                                     num_steps, det=False).detach().to(self.device) # batch_size, num_pixels**2, num_steps
+                                     num_steps, det=False).detach().to(self.device)  # batch_size, num_pixels**2, num_steps
                     fine_z_vals = fine_z_vals.reshape(batch_size, img_size * img_size, num_steps, 1)
 
                     fine_points = transformed_ray_origins.unsqueeze(2).contiguous() + transformed_ray_directions.unsqueeze(2).contiguous() * fine_z_vals.expand(-1,-1,-1,3).contiguous() # dimensions here not matching
@@ -242,3 +247,87 @@ class ImplicitGenerator3d(nn.Module):
             pixels = pixels.permute(0, 3, 1, 2).contiguous().cpu() * 2 - 1
 
         return pixels, depth_map
+
+
+class MirrorGenerator(ImplicitGenerator3d):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.mode = 'normal'
+
+    def mirror_mode(self):
+        self.mode = 'mirror'
+
+    def normal_mode(self):
+        self.mode = 'normal'
+
+    def forward(self, *args, **kwargs):
+        if self.mode == 'normal':
+            return super().forward(*args, **kwargs)
+        elif self.mode == 'mirror':
+            return self.mirror_forward(*args, **kwargs)
+        else:
+            raise RuntimeError('Do not manually set the generator mode! use mirror_mode() or normal_mode()!')
+
+    @staticmethod
+    def invert_point_tensor(point_tensor):
+        return point_tensor[:, :, [2, 1, 0]]
+
+    def mirror_forward(self, z, img_size, fov, ray_start, ray_end, num_steps, h_stddev, v_stddev, h_mean, v_mean, hierarchical_sample, sample_dist=None, lock_view_dependence=False, **kwargs):
+
+        batch_size = z.shape[0]
+
+        with torch.no_grad():
+            # In mirror mode we only want half of the batch size as initial rays
+            half_batch_size = batch_size // 2
+            points_cam, z_vals, rays_d_cam = get_initial_rays_trig(half_batch_size, num_steps, resolution=(img_size, img_size), device=self.device, fov=fov, ray_start=ray_start, ray_end=ray_end) # batch_size, pixels, num_steps, 1
+            transformed_points, z_vals, transformed_ray_directions, transformed_ray_origins, pitch, yaw, camera_origin = transform_sampled_points(points_cam, z_vals, rays_d_cam, h_stddev=h_stddev, v_stddev=v_stddev, h_mean=h_mean, v_mean=v_mean, device=self.device, mode=sample_dist)
+
+            transformed_ray_directions_expanded = torch.unsqueeze(transformed_ray_directions, -2)
+            transformed_ray_directions_expanded = transformed_ray_directions_expanded.expand(-1, -1, num_steps, -1)
+            transformed_ray_directions_expanded = transformed_ray_directions_expanded.reshape(half_batch_size, img_size * img_size * num_steps, 3)
+            transformed_points = transformed_points.reshape(half_batch_size, img_size*img_size*num_steps, 3)
+
+            if lock_view_dependence:
+                transformed_ray_directions_expanded = torch.zeros_like(transformed_ray_directions_expanded)
+                transformed_ray_directions_expanded[..., -1] = -1
+
+            # Concatenate
+            transformed_points = torch.cat(
+                (transformed_points, self.invert_point_tensor(transformed_points)),
+                dim=0
+            )
+
+            transformed_ray_directions_expanded = torch.cat(
+                (transformed_ray_directions_expanded, self.invert_point_tensor(transformed_ray_directions_expanded)),
+                dim=0
+            )
+
+            z_vals = torch.cat((z_vals, z_vals), dim=0)
+
+            z = torch.cat((z[:half_batch_size, :], z[:half_batch_size, :]), dim=0)
+
+            pitch = torch.cat((pitch, pitch), dim=0)
+
+            inverse_yaw = torch.atan2(camera_origin[:, 0], camera_origin[:, 2]).unsqueeze(dim=1)
+            yaw = torch.cat((yaw, inverse_yaw), dim=0)
+            # print("transformed_points ", transformed_points.shape)
+            # print("transformed_ray_directions_expanded ", transformed_ray_directions_expanded.shape)
+            # print("z_vals ", z_vals.shape)
+            # print("z ", z.shape)
+            # print("pitch ", pitch.shape)
+            # print("yaw ", yaw.shape)
+            # print("inverse_yaw ", inverse_yaw.shape)
+        coarse_output = self.siren(transformed_points, z, ray_directions=transformed_ray_directions_expanded).reshape(batch_size, img_size * img_size, num_steps, 4)
+
+        if hierarchical_sample:
+            raise RuntimeError("hierarchical_sample hasn't been implemented for the mirror generator yet")
+        else:
+            all_outputs = coarse_output
+            all_z_vals = z_vals
+
+        pixels, depth, weights = fancy_integration(all_outputs, all_z_vals, device=self.device, white_back=kwargs.get('white_back', False), last_back=kwargs.get('last_back', False), clamp_mode=kwargs['clamp_mode'], noise_std=kwargs['nerf_noise'])
+
+        pixels = pixels.reshape((batch_size, img_size, img_size, 3))
+        pixels = pixels.permute(0, 3, 1, 2).contiguous() * 2 - 1
+
+        return pixels, torch.cat([pitch, yaw], -1)

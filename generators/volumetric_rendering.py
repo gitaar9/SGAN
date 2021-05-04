@@ -77,6 +77,7 @@ def get_initial_rays_trig(n, num_steps, device, fov, resolution, ray_start, ray_
 
     return points, z_vals, rays_d_cam
 
+
 def perturb_points(points, z_vals, ray_directions, device):
     distance_between_points = z_vals[:,:,1:2,:] - z_vals[:,:,0:1,:]
     offset = (torch.rand(z_vals.shape, device=device)-0.5) * distance_between_points
@@ -85,6 +86,7 @@ def perturb_points(points, z_vals, ray_directions, device):
     points = points + offset * ray_directions.unsqueeze(2)
     return points, z_vals
 
+
 def perturb_points_2(points, z_vals, ray_directions, device, spread):
     distance_between_points = z_vals[:,:,1:2,:] - z_vals[:,:,0:1,:]
     offset = torch.randn(z_vals.shape, device=device) * spread
@@ -92,6 +94,7 @@ def perturb_points_2(points, z_vals, ray_directions, device, spread):
 
     points = points + offset * ray_directions.unsqueeze(2).contiguous()
     return points, z_vals
+
 
 def transform_sampled_points(points, z_vals, ray_directions, device, h_stddev=1, v_stddev=1, h_mean=math.pi * 0.5, v_mean=math.pi * 0.5, mode='normal'):
     n, num_rays, num_steps, channels = points.shape
@@ -120,7 +123,7 @@ def transform_sampled_points(points, z_vals, ray_directions, device, h_stddev=1,
     # print(homogeneous_origins)
     transformed_ray_origins = torch.bmm(cam2world_matrix, homogeneous_origins).permute(0, 2, 1).reshape(n, num_rays, 4)[..., :3]
 
-    return transformed_points[..., :3], z_vals, transformed_ray_directions, transformed_ray_origins, pitch, yaw
+    return transformed_points[..., :3], z_vals, transformed_ray_directions, transformed_ray_origins, pitch, yaw, camera_origin
 
 
 def sample_camera_positions(device, n=1, r=1, horizontal_stddev=1, vertical_stddev=1, horizontal_mean=math.pi*0.5, vertical_mean=math.pi*0.5, mode='normal'):

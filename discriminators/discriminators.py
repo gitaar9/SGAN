@@ -183,7 +183,6 @@ class ProgressiveEncoderDiscriminator(nn.Module):
         self.final_layer = nn.Conv2d(400, 1 + 256 + 2, 2)
         self.img_size_to_layer = {2:8, 4:7, 8:6, 16:5, 32:4, 64:3, 128:2, 256:1, 512:0}
 
-
     def forward(self, input, alpha, instance_noise=0, **kwargs):
         if instance_noise > 0:
             input = input + torch.randn_like(input) * instance_noise

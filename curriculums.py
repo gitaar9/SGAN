@@ -185,7 +185,7 @@ SPATIALSIRENBASELINELB = {
 }
 
 PEREGRINETESTCURRICULUM = {
-    0: {'batch_size': 8, 'num_steps': 64, 'img_size': 32, 'batch_split': 2, 'gen_lr': 4e-5, 'disc_lr': 4e-4},
+    0: {'batch_size': 16, 'num_steps': 48, 'img_size': 32, 'batch_split': 4, 'gen_lr': 4e-5, 'disc_lr': 4e-4},
 
     'fov': 30,
     'ray_start': 0.75,
@@ -205,13 +205,13 @@ PEREGRINETESTCURRICULUM = {
     'latent_dim': 256,
     'grad_clip': 1,
     'model': 'TALLSIREN',
-    'generator': 'ImplicitGenerator3d',
+    'generator': 'MirrorGenerator',
     'discriminator': 'ProgressiveEncoderDiscriminator',
     'dataset': 'CARLA',
     'white_back': True,
     'clamp_mode': 'relu',
     'z_dist': 'gaussian',
-    'hierarchical_sample': True,
+    'hierarchical_sample': False,
     'z_lambda': 0,
     'pos_lambda': 0,
     'learnable_dist': False,

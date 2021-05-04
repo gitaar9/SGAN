@@ -231,7 +231,9 @@ def train(opt):
             for split in range(metadata['batch_split']):
                 with torch.cuda.amp.autocast():
                     subset_z = z[split * split_batch_size:(split+1) * split_batch_size]
+                    generator.mirror_mode()
                     gen_imgs, gen_positions = generator(subset_z, **metadata)
+                    generator.normal_mode()
                     g_preds, g_pred_latent, g_pred_position = discriminator(gen_imgs, alpha, **metadata)
 
                     topk_percentage = max(0.99 ** (discriminator.step/metadata['topk_interval']), metadata['topk_v']) if 'topk_interval' in metadata and 'topk_v' in metadata else 1
