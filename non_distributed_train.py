@@ -142,7 +142,6 @@ def train(opt):
             step_next_upsample = curriculums.next_upsample_step(curriculum, discriminator.step)
             step_last_upsample = curriculums.last_upsample_step(curriculum, discriminator.step)
 
-
             interior_step_bar.reset(total=(step_next_upsample - step_last_upsample))
             interior_step_bar.set_description(f"Progress to next stage")
             interior_step_bar.update((discriminator.step - step_last_upsample))

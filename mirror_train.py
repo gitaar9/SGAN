@@ -89,6 +89,7 @@ def train(opt):
             scaler.load_state_dict(torch.load(os.path.join(opt.load_dir, 'scaler.pth')))
 
     generator_losses = []
+    generator_sym_losses = []
     discriminator_losses = []
 
     if opt.set_step != None:
@@ -232,7 +233,7 @@ def train(opt):
                 with torch.cuda.amp.autocast():
                     subset_z = z[split * split_batch_size:(split+1) * split_batch_size]
                     generator.mirror_mode()
-                    gen_imgs, gen_positions = generator(subset_z, **metadata)
+                    gen_imgs, gen_positions, gen_raw_point_predictions = generator(subset_z, **metadata)
                     generator.normal_mode()
                     g_preds, g_pred_latent, g_pred_position = discriminator(gen_imgs, alpha, **metadata)
 
@@ -247,7 +248,18 @@ def train(opt):
                     g_loss = torch.nn.functional.softplus(-g_preds).mean() + identity_penalty
                     generator_losses.append(g_loss.item())
 
-                scaler.scale(g_loss).backward()
+                    # Symmetrical loss
+                    half_split_batch_size = split_batch_size // 2
+                    target_tensor = torch.cat((gen_raw_point_predictions[half_split_batch_size:, :], gen_raw_point_predictions[:half_split_batch_size, :]), dim=0)
+                    if not opt.optimize_symmetric_color:
+                        target_tensor[:, :3] = gen_raw_point_predictions[:, :3]
+                    target_tensor = target_tensor.detach()
+                    sym_loss = torch.nn.L1Loss()(gen_raw_point_predictions, target_tensor) * .5
+                    generator_sym_losses.append(sym_loss.item())
+                if opt.use_sym_loss:
+                    scaler.scale(g_loss + sym_loss).backward()
+                else:
+                    scaler.scale(g_loss).backward()
 
             scaler.unscale_(optimizer_G)
             torch.nn.utils.clip_grad_norm_(generator.parameters(), metadata.get('grad_clip', 0.3))
@@ -264,7 +276,7 @@ def train(opt):
                 # print('Error from interior_step_bar.update at line 304', e)
             if i % 10 == 0:
                 try:
-                    tqdm.write(f"[Experiment: {opt.output_dir}] [GPU: {os.environ['CUDA_VISIBLE_DEVICES']}] [Epoch: {discriminator.epoch}/{opt.n_epochs}] [D loss: {d_loss.item()}] [G loss: {g_loss.item()}] [Step: {discriminator.step}] [Alpha: {alpha:.2f}] [Img Size: {metadata['img_size']}] [Batch Size: {metadata['batch_size']}] [TopK: {topk_num}] [Scale: {scaler.get_scale()}]")
+                    tqdm.write(f"[Experiment: {opt.output_dir}] [GPU: {os.environ['CUDA_VISIBLE_DEVICES']}] [Epoch: {discriminator.epoch}/{opt.n_epochs}] [D loss: {d_loss.item()}] [G loss: {g_loss.item()} (sym: {sym_loss.item()})] [Step: {discriminator.step}] [Alpha: {alpha:.2f}] [Img Size: {metadata['img_size']}] [Batch Size: {metadata['batch_size']}] [TopK: {topk_num}] [Scale: {scaler.get_scale()}]")
                 except OverflowError:
                     pass
                     # print("Overflow error from line 307 in train.py")
@@ -295,6 +307,7 @@ def train(opt):
                 torch.save(optimizer_D.state_dict(), os.path.join(opt.output_dir, 'optimizer_D.pth'))
                 torch.save(scaler.state_dict(), os.path.join(opt.output_dir, 'scaler.pth'))
                 torch.save(generator_losses, os.path.join(opt.output_dir, 'generator.losses'))
+                torch.save(generator_sym_losses, os.path.join(opt.output_dir, 'generator_sym.losses'))
                 torch.save(discriminator_losses, os.path.join(opt.output_dir, 'discriminator.losses'))
 
             if opt.eval_freq > 0 and (discriminator.step + 1) % opt.eval_freq == 0:
@@ -324,6 +337,8 @@ if __name__ == '__main__':
     parser.add_argument('--eval_freq', type=int, default=1500)
     parser.add_argument('--set_step', type=int, default=None)
     parser.add_argument('--model_save_interval', type=int, default=1500)
+    parser.add_argument('--optimize_symmetric_color', action='store_true', default=False)
+    parser.add_argument('--use_sym_loss', action='store_true', default=False)
 
     opt = parser.parse_args()
     print(opt)

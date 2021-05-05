@@ -317,7 +317,8 @@ class MirrorGenerator(ImplicitGenerator3d):
             # print("pitch ", pitch.shape)
             # print("yaw ", yaw.shape)
             # print("inverse_yaw ", inverse_yaw.shape)
-        coarse_output = self.siren(transformed_points, z, ray_directions=transformed_ray_directions_expanded).reshape(batch_size, img_size * img_size, num_steps, 4)
+        raw_siren = self.siren(transformed_points, z, ray_directions=transformed_ray_directions_expanded)
+        coarse_output = raw_siren.reshape(batch_size, img_size * img_size, num_steps, 4)
 
         if hierarchical_sample:
             raise RuntimeError("hierarchical_sample hasn't been implemented for the mirror generator yet")
@@ -330,4 +331,4 @@ class MirrorGenerator(ImplicitGenerator3d):
         pixels = pixels.reshape((batch_size, img_size, img_size, 3))
         pixels = pixels.permute(0, 3, 1, 2).contiguous() * 2 - 1
 
-        return pixels, torch.cat([pitch, yaw], -1)
+        return pixels, torch.cat([pitch, yaw], -1), raw_siren

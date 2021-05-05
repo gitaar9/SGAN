@@ -29,6 +29,26 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 
+def simple_generator_run(generator, z, device, **metadata):
+    transformed_points, transformed_ray_directions_expanded, camera_origin, z_vals = sample_points_as_in_generator(**metadata, device=device)
+    with torch.no_grad():
+        with torch.cuda.amp.autocast():
+            course_output = query_siren_as_in_generator(generator, transformed_points, transformed_ray_directions_expanded, z, device, **metadata)
+
+    pixels, depth, weights = fancy_integration(course_output, z_vals, device=device,
+                                               white_back=metadata.get('white_back', False),
+                                               last_back=metadata.get('last_back', False),
+                                               clamp_mode=metadata['clamp_mode'], noise_std=metadata['nerf_noise'])
+
+    pixels = pixels.reshape((1, metadata['img_size'], metadata['img_size'], 3))
+    pixels = pixels.permute(0, 3, 1, 2).contiguous() * 2 - 1
+    show_siren_output_as_image(course_output, z_vals, device, **metadata)
+    yaw = torch.atan2(camera_origin[:, 2], camera_origin[:, 0]).cpu().detach().numpy().squeeze()
+    print(yaw)
+
+    return pixels
+
+
 def fancy_plot(generator, z, device, points, camera_origin):
     ax = plt.axes(projection='3d')
     query_uniformly_sampled_points(generator, z, device, ax)
@@ -364,12 +384,15 @@ def train(opt):
     N_images = 1
     z = z_sampler((N_images, metadata['latent_dim']), device=device, dist=metadata['z_dist'])
 
-    metadata['img_size'] = 256
+    metadata['img_size'] = 128
     metadata['max_batch_size'] = 20000
     del metadata['generator']
+    del metadata['discriminator']
 
-    # Experiments for symmetrical loss
-    mirror_experiment(generator, z, device, **metadata)
+    pixels = simple_generator_run(generator, z, device, **metadata)
+    g_preds, g_pred_latent, g_pred_position = discriminator(pixels, 1, **metadata)
+    print(g_preds, g_pred_position)
+    pixels = simple_generator_run(generator, g_pred_latent, device, **metadata)
 
     exit()
     # Experiments for symmetrical loss

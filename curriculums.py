@@ -1,11 +1,13 @@
 import math
 
+
 def next_upsample_step(curriculum, current_step):
     # Return the epoch when it will next upsample
     for curriculum_step in sorted([cs for cs in curriculum.keys() if type(cs) == int]):
         if curriculum_step > current_step:
             return curriculum_step
     return float('Inf')
+
 
 def last_upsample_step(curriculum, current_step):
     # Returns the start epoch of the current stage, i.e. the epoch
@@ -16,12 +18,14 @@ def last_upsample_step(curriculum, current_step):
             last_epoch = curriculum_step
     return last_epoch
 
+
 def get_current_step(curriculum, epoch):
     step = 0
     for update_epoch in curriculum['update_epochs']:
         if epoch >= update_epoch:
             step += 1
     return step
+
 
 def extract_metadata(curriculum, current_step):
     # step = get_current_step(curriculum, epoch)
@@ -34,6 +38,7 @@ def extract_metadata(curriculum, current_step):
     for key in [k for k in curriculum.keys() if type(k) != int]:
         return_dict[key] = curriculum[key]
     return return_dict
+
 
 # CARLA DATASET SCRIPT
 CARLAFORCARS = {
