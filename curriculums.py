@@ -256,6 +256,7 @@ PEREGRINETESTCURRICULUM = {
     'hierarchical_sample': False,
     'z_lambda': 0,
     'pos_lambda': 0,
+    'sym_lambda': 33,
     'learnable_dist': False,
 }
 
@@ -284,7 +285,7 @@ SHAPENETSHIPS_BASELINE = {
     'latent_dim': 256,
     'grad_clip': 1,
     'model': 'TALLSIREN',
-    'generator': 'ImplicitGenerator3d',
+    'generator': 'MirrorGenerator',
     'discriminator': 'ProgressiveEncoderDiscriminator',
     'dataset': 'ShapenetShips',
     'white_back': True,
@@ -322,7 +323,7 @@ SHAPENETSHIPS_SYM_LOSS = {
     'latent_dim': 256,
     'grad_clip': 1,
     'model': 'TALLSIREN',
-    'generator': 'ImplicitGenerator3d',
+    'generator': 'MirrorGenerator',
     'discriminator': 'ProgressiveEncoderDiscriminator',
     'dataset': 'ShapenetShips',
     'white_back': True,
