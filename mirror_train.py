@@ -254,12 +254,10 @@ def train(opt):
                     if not opt.optimize_symmetric_color:
                         target_tensor[:, :3] = gen_raw_point_predictions[:, :3]
                     target_tensor = target_tensor.detach()
-                    sym_loss = torch.nn.L1Loss()(gen_raw_point_predictions, target_tensor) * .5
+                    sym_loss = torch.nn.MSELoss()(gen_raw_point_predictions, target_tensor) * .5
                     generator_sym_losses.append(sym_loss.item())
-                if opt.use_sym_loss:
-                    scaler.scale(g_loss + sym_loss).backward()
-                else:
-                    scaler.scale(g_loss).backward()
+
+                scaler.scale(g_loss + sym_loss * metadata.get('sym_lambda', 0)).backward()
 
             scaler.unscale_(optimizer_G)
             torch.nn.utils.clip_grad_norm_(generator.parameters(), metadata.get('grad_clip', 0.3))
@@ -338,7 +336,6 @@ if __name__ == '__main__':
     parser.add_argument('--set_step', type=int, default=None)
     parser.add_argument('--model_save_interval', type=int, default=1500)
     parser.add_argument('--optimize_symmetric_color', action='store_true', default=False)
-    parser.add_argument('--use_sym_loss', action='store_true', default=False)
 
     opt = parser.parse_args()
     print(opt)

@@ -57,7 +57,23 @@ def fancy_plot(generator, z, device, points, camera_origin):
         points = points.cpu().detach().numpy().squeeze()
     if not isinstance(camera_origin, np.ndarray):
         camera_origin = camera_origin.cpu().detach().numpy().squeeze()
-    plot_3d_points(points, max_points=7500, extra_point=camera_origin, plt_ax=ax, alpha=.01, strange_alpha=True)
+    plot_3d_points(points, max_points=7500, plt_ax=ax, alpha=.01, strange_alpha=True) #extra_point=camera_origin,
+
+    point = np.array([0, 0, 0])
+    normal = np.array([-1, 0, 1])
+
+    # a plane is a*x+b*y+c*z+d=0
+    # [a,b,c] is the normal. Thus, we have to calculate
+    # d and we're set
+    d = -point.dot(normal)
+
+    # create x,y
+    xx, yy = np.meshgrid([-.25, .25], [-.25, .25])
+
+    # calculate corresponding z
+    z = (-normal[0] * xx - normal[1] * yy - d) * 1. / normal[2]
+    # ax.plot3D(, [0, 0], [-.25, .25])
+    ax.plot_surface(xx, yy, z, alpha=1)
 
 
 def fancy_plotting(generator, z, device, metadata):
@@ -126,6 +142,7 @@ def mirror_experiment(generator, z, device, **metadata):
     plt.figure(1, (8, 8))
     transformed_points_numpy = transformed_points.cpu().detach().numpy().squeeze()
     fancy_plot(generator, z, device, transformed_points_numpy, camera_origin)
+
 
     # Show inverted points and camera position
     plt.figure(2, (8, 8))
@@ -389,10 +406,7 @@ def train(opt):
     del metadata['generator']
     del metadata['discriminator']
 
-    pixels = simple_generator_run(generator, z, device, **metadata)
-    g_preds, g_pred_latent, g_pred_position = discriminator(pixels, 1, **metadata)
-    print(g_preds, g_pred_position)
-    pixels = simple_generator_run(generator, g_pred_latent, device, **metadata)
+    mirror_experiment(generator, z, device, **metadata)
 
     exit()
     # Experiments for symmetrical loss

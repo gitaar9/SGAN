@@ -303,25 +303,16 @@ class MirrorGenerator(ImplicitGenerator3d):
             )
 
             z_vals = torch.cat((z_vals, z_vals), dim=0)
-
             z = torch.cat((z[:half_batch_size, :], z[:half_batch_size, :]), dim=0)
-
             pitch = torch.cat((pitch, pitch), dim=0)
-
             inverse_yaw = torch.atan2(camera_origin[:, 0], camera_origin[:, 2]).unsqueeze(dim=1)
             yaw = torch.cat((yaw, inverse_yaw), dim=0)
-            # print("transformed_points ", transformed_points.shape)
-            # print("transformed_ray_directions_expanded ", transformed_ray_directions_expanded.shape)
-            # print("z_vals ", z_vals.shape)
-            # print("z ", z.shape)
-            # print("pitch ", pitch.shape)
-            # print("yaw ", yaw.shape)
-            # print("inverse_yaw ", inverse_yaw.shape)
+
         raw_siren = self.siren(transformed_points, z, ray_directions=transformed_ray_directions_expanded)
         coarse_output = raw_siren.reshape(batch_size, img_size * img_size, num_steps, 4)
 
         if hierarchical_sample:
-            raise RuntimeError("hierarchical_sample hasn't been implemented for the mirror generator yet")
+            raise RuntimeError("Hierarchical sampling is not yet implemented for the mirror generator")
         else:
             all_outputs = coarse_output
             all_z_vals = z_vals

@@ -28,6 +28,7 @@ import copy
 
 from torch_ema import ExponentialMovingAverage
 
+
 def setup(rank, world_size, port):
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = port
@@ -38,6 +39,7 @@ def setup(rank, world_size, port):
 
 def cleanup():
     dist.destroy_process_group()
+
 
 def load_images(images, curriculum, device):
     return_images = []
@@ -117,7 +119,7 @@ def train(rank, world_size, opt):
         mapping_network_parameters = [p for n, p in generator_ddp.named_parameters() if n in mapping_network_param_names]
         generator_parameters = [p for n, p in generator_ddp.named_parameters() if n not in mapping_network_param_names]
         optimizer_G = torch.optim.Adam([{'params': generator_parameters, 'name': 'generator'},
-                                        {'params': mapping_network_parameters, 'name': 'mapping_network', 'lr':metadata['gen_lr']*5e-2}],
+                                        {'params': mapping_network_parameters, 'name': 'mapping_network', 'lr': metadata['gen_lr']*5e-2}],
                                        lr=metadata['gen_lr'], betas=metadata['betas'], weight_decay=metadata['weight_decay'])
     else:
         optimizer_G = torch.optim.Adam(generator_ddp.parameters(), lr=metadata['gen_lr'], betas=metadata['betas'], weight_decay=metadata['weight_decay'])
