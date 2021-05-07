@@ -95,9 +95,7 @@ def download_files_from_peregrine(password, peregrine_names, local_names, peregr
         os.system(peregrine_adress.format(password, peregrine_path.format(p), local_path.format(l)))
 
 
-def main():
-    password = getpass()
-
+def carla_cars_mirror(password):
     # FID plot
     fid_local_names = ['cars_mirror_loss_density', 'cars_mirror_loss_color', 'cars_mirror']
     if password:
@@ -134,10 +132,58 @@ def main():
             peregrine_path='/data/s2576597/SGAN/carla_for_{}/generator.losses',
             local_path='mirror_loss_results/sgan_{}_generator.losses'
         )
-    plt.figure(1)
+    plt.figure(2)
     plot_sym_loss(sym_loss_local_names, 'mirror_loss_results/sgan_{}_generator.losses', 'Gen loss', 'time', 'loss')
+    plt.show()
+
+
+def snships_mirror_l2(password):
+    # FID plot
+    local_names = ['shapenetships_baseline', 'shapenetships_sym_loss']
+    peregrine_names = ['shapenetships_baseline', 'shapenetships_sym_loss']
+    if password:
+        download_files_from_peregrine(
+            password=password,
+            peregrine_names=peregrine_names,
+            local_names=local_names,
+            peregrine_path='/data/s2576597/SGAN/{}/fid.txt',
+            local_path='mirror_loss_results/sgan_{}_fid.txt'
+        )
+    plt.figure(0)
+    plot_pi_gan_plots(local_names)
+
+    # Sym loss plot
+    sym_loss_local_names = ['shapenetships_baseline', 'shapenetships_sym_loss']
+    if password:
+        download_files_from_peregrine(
+            password=password,
+            peregrine_names=peregrine_names,
+            local_names=local_names,
+            peregrine_path='/data/s2576597/SGAN/{}/generator_sym.losses',
+            local_path='mirror_loss_results/sgan_{}_generator_sym.losses'
+        )
+    plt.figure(1)
+    plot_sym_loss(local_names, 'mirror_loss_results/sgan_{}_generator_sym.losses', 'Sym loss', 'time', 'loss')
+
+    # Gen loss plot
+    if password:
+        download_files_from_peregrine(
+            password=password,
+            peregrine_names=peregrine_names,
+            local_names=local_names,
+            peregrine_path='/data/s2576597/SGAN/{}/generator.losses',
+            local_path='mirror_loss_results/sgan_{}_generator.losses'
+        )
+    plt.figure(2)
+    plot_sym_loss(local_names, 'mirror_loss_results/sgan_{}_generator.losses', 'Gen loss', 'time', 'loss')
 
     plt.show()
+
+
+def main():
+    password = getpass()
+    snships_mirror_l2(password)
+    # carla_cars_mirror(password)
 
 
 if __name__ == '__main__':

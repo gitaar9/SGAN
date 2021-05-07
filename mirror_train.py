@@ -91,6 +91,7 @@ def train(opt):
     generator_losses = []
     generator_sym_losses = []
     discriminator_losses = []
+    max_memories = []
 
     if opt.set_step != None:
         generator.step = opt.set_step
@@ -307,6 +308,7 @@ def train(opt):
                 torch.save(generator_losses, os.path.join(opt.output_dir, 'generator.losses'))
                 torch.save(generator_sym_losses, os.path.join(opt.output_dir, 'generator_sym.losses'))
                 torch.save(discriminator_losses, os.path.join(opt.output_dir, 'discriminator.losses'))
+                torch.save(max_memories, os.path.join(opt.output_dir, 'max_memories.sizes'))
 
             if opt.eval_freq > 0 and (discriminator.step + 1) % opt.eval_freq == 0:
                 generated_dir = os.path.join(opt.output_dir, 'evaluation/generated')
@@ -323,6 +325,7 @@ def train(opt):
             generator.step += 1
         discriminator.epoch += 1
         generator.epoch += 1
+        max_memories.append(torch.cuda.max_memory_allocated(device=device))
 
 
 if __name__ == '__main__':

@@ -332,7 +332,7 @@ SHAPENETSHIPS_SYM_LOSS = {
     'hierarchical_sample': False,
     'z_lambda': 0,
     'pos_lambda': 0,
-    'sym_lambda': 33,
+    'sym_lambda': 100,
     'learnable_dist': False,
 }
 

@@ -51,29 +51,33 @@ def simple_generator_run(generator, z, device, **metadata):
 
 def fancy_plot(generator, z, device, points, camera_origin):
     ax = plt.axes(projection='3d')
+    ax.view_init(elev=0, azim=90)
     query_uniformly_sampled_points(generator, z, device, ax)
 
     if not isinstance(points, np.ndarray):
         points = points.cpu().detach().numpy().squeeze()
     if not isinstance(camera_origin, np.ndarray):
         camera_origin = camera_origin.cpu().detach().numpy().squeeze()
-    plot_3d_points(points, max_points=7500, plt_ax=ax, alpha=.01, strange_alpha=True) #extra_point=camera_origin,
+    plot_3d_points(points, max_points=7500, extra_point=camera_origin, plt_ax=ax, alpha=.01, strange_alpha=True) #
 
-    point = np.array([0, 0, 0])
-    normal = np.array([-1, 0, 1])
 
-    # a plane is a*x+b*y+c*z+d=0
-    # [a,b,c] is the normal. Thus, we have to calculate
-    # d and we're set
-    d = -point.dot(normal)
+    ax.plot3D([-.25, .25], [0, 0], [-.25, .25], c='red')
+    ax.plot3D([-.25, .25], [.4, .4], [-.25, .25], c='red')
 
-    # create x,y
-    xx, yy = np.meshgrid([-.25, .25], [-.25, .25])
-
-    # calculate corresponding z
-    z = (-normal[0] * xx - normal[1] * yy - d) * 1. / normal[2]
-    # ax.plot3D(, [0, 0], [-.25, .25])
-    ax.plot_surface(xx, yy, z, alpha=1)
+    # point = np.array([0, 0, 0])
+    # normal = np.array([-1, 0, 1])
+    #
+    # # a plane is a*x+b*y+c*z+d=0
+    # # [a,b,c] is the normal. Thus, we have to calculate
+    # # d and we're set
+    # d = -point.dot(normal)
+    #
+    # # create x,y
+    # xx, yy = np.meshgrid([-.25, .25], [-.25, .25])
+    #
+    # # calculate corresponding z
+    # z = (-normal[0] * xx - normal[1] * yy - d) * 1. / normal[2]
+    # ax.plot_surface(xx, yy, z, alpha=1)
 
 
 def fancy_plotting(generator, z, device, metadata):
@@ -295,6 +299,8 @@ def plot_points(coordinates_list, rgb, alpha, plt_ax=None):
         ax = plt.axes(projection='3d')
     else:
         ax = plt_ax
+    ax.view_init(elev=0, azim=90)
+
     ax.scatter(*list(zip(*coordinates_list)), marker='.', c=list(rgba))
 
     if plt_ax is None:
@@ -406,7 +412,7 @@ def train(opt):
     del metadata['generator']
     del metadata['discriminator']
 
-    mirror_experiment(generator, z, device, **metadata)
+    query_uniformly_sampled_points(generator, z, device)
 
     exit()
     # Experiments for symmetrical loss
