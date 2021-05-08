@@ -139,8 +139,8 @@ def carla_cars_mirror(password):
 
 def snships_mirror_l2(password):
     # FID plot
-    local_names = ['shapenetships_baseline', 'shapenetships_sym_loss']
-    peregrine_names = ['shapenetships_baseline', 'shapenetships_sym_loss']
+    local_names = ['shapenetships_baseline', 'shapenetships_sym_loss', 'shapenetships_sym_loss_100_lambda', 'shapenetcars_sym_loss', 'shapenetcars_baseline']
+    peregrine_names = ['shapenetships_baseline', 'shapenetships_sym_loss', 'shapenetships_sym_loss_100_lambda', 'shapenetcars_sym_loss', 'shapenetcars_baseline']
     if password:
         download_files_from_peregrine(
             password=password,
@@ -153,7 +153,6 @@ def snships_mirror_l2(password):
     plot_pi_gan_plots(local_names)
 
     # Sym loss plot
-    sym_loss_local_names = ['shapenetships_baseline', 'shapenetships_sym_loss']
     if password:
         download_files_from_peregrine(
             password=password,
@@ -176,6 +175,20 @@ def snships_mirror_l2(password):
         )
     plt.figure(2)
     plot_sym_loss(local_names, 'mirror_loss_results/sgan_{}_generator.losses', 'Gen loss', 'time', 'loss')
+
+    # Max GPU memory
+    local_names = ['shapenetships_sym_loss_100_lambda']
+    peregrine_names = ['shapenetships_sym_loss_100_lambda']
+    if password:
+        download_files_from_peregrine(
+            password=password,
+            peregrine_names=peregrine_names,
+            local_names=local_names,
+            peregrine_path='/data/s2576597/SGAN/{}/max_memories.sizes',
+            local_path='mirror_loss_results/sgan_{}_max_memories.sizes'
+        )
+    plt.figure(3)
+    plot_sym_loss(local_names, 'mirror_loss_results/sgan_{}_max_memories.sizes', 'Max GPU mem', 'time', 'Memory')
 
     plt.show()
 
