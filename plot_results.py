@@ -193,10 +193,30 @@ def snships_mirror_l2(password):
     plt.show()
 
 
+def download_model_files(password, run_name):
+    peregrine_adress = 'sshpass -p "{}" scp s2576597@peregrine.hpc.rug.nl:{} {}'
+    p_location = '/data/s2576597/SGAN/{}/'.format(run_name)
+    l_location = '/home/gitaar9/AI/TNO/S-GAN-prerelease/models/{}/'.format(run_name)
+    files = [
+        "ema2.pth",
+        "ema.pth",
+        "optimizer_D.pth",
+        "optimizer_G.pth",
+        "generator.pth",
+        "discriminator.pth",
+        "scaler.pth"
+    ]
+    os.system(f"mkdir {l_location}")
+    for file_name in files:
+        print(f"Downloading {p_location + file_name}")
+        os.system(peregrine_adress.format(password, p_location + file_name, l_location))
+
+
 def main():
     password = getpass()
     snships_mirror_l2(password)
     # carla_cars_mirror(password)
+    # download_model_files(password, 'shapenetships_sym_loss')
 
 
 if __name__ == '__main__':

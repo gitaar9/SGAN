@@ -236,6 +236,20 @@ def train(opt):
                     generator.mirror_mode()
                     gen_imgs, gen_positions, gen_raw_point_predictions = generator(subset_z, **metadata)
                     generator.normal_mode()
+                    #
+                    # gen_imgs = gen_imgs.detach().cpu().permute(0, 2, 3, 1).numpy()
+                    # print(np.min(gen_imgs), np.max(gen_imgs))
+                    # gen_imgs = ((gen_imgs + 1) / 2) * 255
+                    # print(np.min(gen_imgs), np.max(gen_imgs))
+                    # gen_imgs = gen_imgs.astype(np.uint8)
+                    # from PIL import Image
+                    # for img in gen_imgs:
+                    #
+                    #     print(img.shape)
+                    #     im = Image.fromarray(img, 'RGB')
+                    #     im.show()
+                    #
+                    # exit()
                     g_preds, g_pred_latent, g_pred_position = discriminator(gen_imgs, alpha, **metadata)
 
                     topk_percentage = max(0.99 ** (discriminator.step/metadata['topk_interval']), metadata['topk_v']) if 'topk_interval' in metadata and 'topk_v' in metadata else 1

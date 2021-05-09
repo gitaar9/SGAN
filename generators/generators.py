@@ -302,24 +302,88 @@ class MirrorGenerator(ImplicitGenerator3d):
                 dim=0
             )
 
+            half_z_vals = z_vals
             z_vals = torch.cat((z_vals, z_vals), dim=0)
-            z = torch.cat((z[:half_batch_size, :], z[:half_batch_size, :]), dim=0)
-            pitch = torch.cat((pitch, pitch), dim=0)
-            inverse_yaw = torch.atan2(camera_origin[:, 0], camera_origin[:, 2]).unsqueeze(dim=1)
-            yaw = torch.cat((yaw, inverse_yaw), dim=0)
+            half_z = z[:half_batch_size, :]
+            z = torch.cat((half_z, half_z), dim=0)
 
-        raw_siren = self.siren(transformed_points, z, ray_directions=transformed_ray_directions_expanded)
+        raw_siren = self.siren(transformed_points, z, ray_directions=transformed_ray_directions_expanded)   # Shape = [batch_size, amount_of_points, 4]
         coarse_output = raw_siren.reshape(batch_size, img_size * img_size, num_steps, 4)
 
         if hierarchical_sample:
-            raise RuntimeError("Hierarchical sampling is not yet implemented for the mirror generator")
+            fine_output, fine_z_vals, fine_raw_siren = self.mirror_hierarchical_sampling(
+                img_size=img_size,
+                num_steps=num_steps,
+                z=z,
+                half_coarse_output=coarse_output[:half_batch_size, :],
+                half_z_vals=half_z_vals,
+                half_transformed_ray_origins=transformed_ray_origins,
+                half_transformed_ray_directions=transformed_ray_directions,
+                transformed_ray_directions_expanded=transformed_ray_directions_expanded,
+                lock_view_dependence=lock_view_dependence,
+                **kwargs
+            )
+            # fine siren shape is same as raw siren
+
+            all_outputs = torch.cat([fine_output, coarse_output], dim=-2)
+            all_z_vals = torch.cat([fine_z_vals, z_vals], dim=-2)
+            _, indices = torch.sort(all_z_vals, dim=-2)
+            all_z_vals = torch.gather(all_z_vals, -2, indices)
+            # Target sizes: [-1, -1, -1, 4].  Tensor sizes: [240, 512, 12]
+            all_outputs = torch.gather(all_outputs, -2, indices.expand(-1, -1, -1, 4))
+
+            all_raw_siren = torch.cat([fine_raw_siren, raw_siren], dim=-2)
         else:
             all_outputs = coarse_output
             all_z_vals = z_vals
+            all_raw_siren = raw_siren
 
         pixels, depth, weights = fancy_integration(all_outputs, all_z_vals, device=self.device, white_back=kwargs.get('white_back', False), last_back=kwargs.get('last_back', False), clamp_mode=kwargs['clamp_mode'], noise_std=kwargs['nerf_noise'])
 
         pixels = pixels.reshape((batch_size, img_size, img_size, 3))
         pixels = pixels.permute(0, 3, 1, 2).contiguous() * 2 - 1
 
-        return pixels, torch.cat([pitch, yaw], -1), raw_siren
+        # Returning pitch/yaw for a loss that is not used
+        pitch = torch.cat((pitch, pitch), dim=0)
+        inverse_yaw = torch.atan2(camera_origin[:, 0], camera_origin[:, 2]).unsqueeze(dim=1)
+        yaw = torch.cat((yaw, inverse_yaw), dim=0)
+
+        return pixels, torch.cat([pitch, yaw], -1), all_raw_siren
+
+    def mirror_hierarchical_sampling(self, z, img_size, num_steps, half_coarse_output, half_z_vals, half_transformed_ray_origins, half_transformed_ray_directions, transformed_ray_directions_expanded, lock_view_dependence=False, **kwargs):
+        batch_size = z.shape[0]
+        half_batch_size = batch_size // 2
+        with torch.no_grad():
+            _, _, weights = fancy_integration(half_coarse_output, half_z_vals, device=self.device,
+                                              clamp_mode=kwargs['clamp_mode'], noise_std=kwargs['nerf_noise'])
+
+            weights = weights.reshape(half_batch_size * img_size * img_size, num_steps) + 1e-5
+            #### Start new importance sampling
+            # RuntimeError: Sizes of tensors must match except in dimension 1. Got 3072 and 6144 (The offending index is 0)
+            half_z_vals = half_z_vals.reshape(half_batch_size * img_size * img_size,
+                                    num_steps)  # We squash the dimensions here. This means we importance sample for every batch for every ray
+            z_vals_mid = 0.5 * (half_z_vals[:, :-1] + half_z_vals[:, 1:])  # (N_rays, N_samples-1) interval mid points
+            half_z_vals = half_z_vals.reshape(half_batch_size, img_size * img_size, num_steps, 1)
+            half_fine_z_vals = sample_pdf(z_vals_mid, weights[:, 1:-1],
+                                     num_steps, det=False).detach()  # batch_size, num_pixels**2, num_steps
+            half_fine_z_vals = half_fine_z_vals.reshape(half_batch_size, img_size * img_size, num_steps, 1)
+
+            half_fine_points = half_transformed_ray_origins.unsqueeze(2).contiguous() + half_transformed_ray_directions.unsqueeze(
+                2).contiguous() * half_fine_z_vals.expand(-1, -1, -1, 3).contiguous()  # dimensions here not matching
+            half_fine_points = half_fine_points.reshape(half_batch_size, img_size * img_size * num_steps, 3)
+
+            #Concatenate
+            fine_points = torch.cat(
+                (half_fine_points, self.invert_point_tensor(half_fine_points)),
+                dim=0
+            )
+            fine_z_vals = torch.cat((half_fine_z_vals, half_fine_z_vals), dim=0)
+
+            if lock_view_dependence:
+                transformed_ray_directions_expanded = torch.zeros_like(transformed_ray_directions_expanded)
+                transformed_ray_directions_expanded[..., -1] = -1
+            #### end new importance sampling
+
+        fine_raw_siren = self.siren(fine_points, z, ray_directions=transformed_ray_directions_expanded)
+        fine_output = fine_raw_siren.reshape(batch_size, img_size * img_size, -1, 4)
+        return fine_output, fine_z_vals, fine_raw_siren
