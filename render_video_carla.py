@@ -97,19 +97,18 @@ for seed in opt.seeds:
     z = torch.randn(1, 256, device=device)
 
     with torch.no_grad():
-        with torch.cuda.amp.autocast():
-            for pitch, yaw, fov in tqdm(trajectory):
-                curriculum['h_mean'] = yaw #  + 3.14/2
-                curriculum['v_mean'] = pitch #  + 3.14/2
-                curriculum['fov'] = fov
-                curriculum['h_stddev'] = 0
-                curriculum['v_stddev'] = 0
-
+        for pitch, yaw, fov in tqdm(trajectory):
+            curriculum['h_mean'] = yaw #  + 3.14/2
+            curriculum['v_mean'] = pitch #  + 3.14/2
+            curriculum['fov'] = fov
+            curriculum['h_stddev'] = 0
+            curriculum['v_stddev'] = 0
+            with torch.cuda.amp.autocast():
                 frame, depth_map = generator.staged_forward(z, max_batch_size=opt.max_batch_size, depth_map=opt.depth_map, **curriculum)
                 frames.append(tensor_to_PIL(frame))
 
-            for frame in frames:
-                for _ in range(frame_repeat):
-                    writer.writeFrame(np.array(frame))
+    for frame in frames:
+        for _ in range(frame_repeat):
+            writer.writeFrame(np.array(frame))
 
-            writer.close()
+    writer.close()

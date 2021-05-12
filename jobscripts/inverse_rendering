@@ -3,7 +3,7 @@
 #SBATCH --time=02:00:00
 #SBATCH --partition=gpushort
 #SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32GB
+#SBATCH --mem=8GB
 #SBATCH --job-name=inverse_render
 
 ml CUDA/10.2.89-GCC-8.3.0

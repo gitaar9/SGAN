@@ -108,7 +108,7 @@ for i in range(n_iterations):
     loss = torch.nn.MSELoss()(frame, gt_image)
     loss = loss.mean()
     
-    print(i, ": ", loss.item())
+    print(f"{i + 1}/{n_iterations}: {loss.item()} {scheduler.get_lr()}")
 
     loss.backward()
     optimizer.step()
@@ -122,7 +122,6 @@ for i in range(n_iterations):
                 # frames.append(img[0].cpu().permute(1,2,0) * 0.5 + 0.5)
     
     scheduler.step()
-    print(scheduler.get_lr())
 
     if i % 25 == 0:
         save_image(frame, f"{opt.output_dir}/{i}.jpg", normalize=True)
@@ -146,8 +145,6 @@ for t in np.linspace(0, 1, 24):
         trajectory.append((pitch, yaw))
 
 # output_name = opt.output if opt.output else os.path.splitext(os.path.basename(opt.z))[0] + '.mp4'
-output_name = 'inverse_render.mp4'
-writer = skvideo.io.FFmpegWriter(os.path.join(f'{opt.output_dir}', output_name), outputdict={'-pix_fmt': 'yuv420p', '-crf': '21'})
 
 # frames = []
 # depths = []
@@ -157,10 +154,19 @@ with torch.no_grad():
     for pitch, yaw in tqdm(trajectory):
         render_options['h_mean'] = yaw
         render_options['v_mean'] = pitch
+        with torch.cuda.amp.autocast():
+            frame, depth_map = generator.staged_forward_with_frequencies(w_frequencies + w_frequency_offsets, w_phase_shifts + w_phase_shift_offsets, max_batch_size=opt.max_batch_size, lock_view_dependence=True, **render_options)
+            frames.append(tensor_to_PIL(frame))
+            # depths.append(tensor_to_PIL(depth_map))
 
-        frame, depth_map = generator.staged_forward_with_frequencies(w_frequencies + w_frequency_offsets, w_phase_shifts + w_phase_shift_offsets, max_batch_size=opt.max_batch_size, lock_view_dependence=True, **render_options)
-        frames.append(tensor_to_PIL(frame))
-        # depths.append(tensor_to_PIL(depth_map))
+
+output_name = 'inverse_render.gif'
+img, *imgs = frames
+img.save(fp=output_name, format='GIF', append_images=imgs,
+         save_all=True, duration=200, loop=0)
+
+output_name = 'inverse_render.mp4'
+writer = skvideo.io.FFmpegWriter(os.path.join(f'{opt.output_dir}', output_name), outputdict={'-pix_fmt': 'yuv420p', '-crf': '21'})
 
 frame_repeat = 2
 for frame in frames:

@@ -289,8 +289,6 @@ class ImplicitGenerator3d(nn.Module):
             # END BATCHED SAMPLE
 
             if hierarchical_sample:
-                print('hierarchical')
-
                 with torch.no_grad():
                     transformed_points = transformed_points.reshape(batch_size, img_size * img_size, num_steps, 3)
                     _, _, weights = fancy_integration(coarse_output, z_vals, device=self.device,
