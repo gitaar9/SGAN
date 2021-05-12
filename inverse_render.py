@@ -133,15 +133,18 @@ for i in range(n_iterations):
                     save_image(img, f"{opt.output_dir}/{i}_{angle}.jpg", normalize=True)
 
 trajectory = [] 
-for t in np.linspace(0, 1, 24):
-    pitch = 0.2 * t
-    yaw = 0
-    trajectory.append((pitch, yaw))
 for t in np.linspace(0, 1, opt.num_frames):
-    pitch = 0.2 * np.cos(t * 2 * math.pi)
-    yaw = 0.4 * np.sin(t * 2 * math.pi)
+    pitch = ((math.pi / 2 * 85 / 90) * t)
+    yaw = (2 * math.pi * t) - (math.pi * 0.5)
+    fov = 30
     trajectory.append((pitch, yaw))
-        
+for t in np.linspace(0, 1, 24):
+    for t in np.linspace(0, 1, 24):
+        pitch = (math.pi / 2 * 85 / 90)
+        yaw = (2 * math.pi * t) - (math.pi * 0.5)
+        fov = 30
+        trajectory.append((pitch, yaw))
+
 # output_name = opt.output if opt.output else os.path.splitext(os.path.basename(opt.z))[0] + '.mp4'
 output_name = 'inverse_render.mp4'
 writer = skvideo.io.FFmpegWriter(os.path.join(f'{opt.output_dir}', output_name), outputdict={'-pix_fmt': 'yuv420p', '-crf': '21'})
@@ -152,15 +155,17 @@ writer = skvideo.io.FFmpegWriter(os.path.join(f'{opt.output_dir}', output_name),
 
 with torch.no_grad():
     for pitch, yaw in tqdm(trajectory):
-        render_options['h_mean'] = yaw + 3.14/2
-        render_options['v_mean'] = pitch + 3.14/2
+        render_options['h_mean'] = yaw
+        render_options['v_mean'] = pitch
 
         frame, depth_map = generator.staged_forward_with_frequencies(w_frequencies + w_frequency_offsets, w_phase_shifts + w_phase_shift_offsets, max_batch_size=opt.max_batch_size, lock_view_dependence=True, **render_options)
         frames.append(tensor_to_PIL(frame))
         # depths.append(tensor_to_PIL(depth_map))
 
+frame_repeat = 2
 for frame in frames:
-    writer.writeFrame(np.array(frame))
+    for _ in range(frame_repeat):
+        writer.writeFrame(np.array(frame))
 # for depth in depths:
 #     writer.writeFrame(np.array(depth))
 writer.close()
