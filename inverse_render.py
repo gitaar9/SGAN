@@ -22,6 +22,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 parser = argparse.ArgumentParser()
 parser.add_argument('generator_path', type=str)
 parser.add_argument('image_path', type=str)
+parser.add_argument('--output_dir', type=str, default='inverse_images')
 parser.add_argument('--seed', type=int, default=None)
 parser.add_argument('--image_size', type=int, default=128)
 parser.add_argument('--num_frames', type=int, default=128)
@@ -98,7 +99,7 @@ frames = []
 
 n_iterations = 700
 
-save_image(gt_image, "debug/gt.jpg", normalize=True)
+save_image(gt_image, f"{opt.output_dir}/gt.jpg", normalize=True)
 
 for i in range(n_iterations):
     noise_w_frequencies = 0.03 * torch.randn_like(w_frequencies) * (n_iterations - i)/n_iterations
@@ -123,11 +124,11 @@ for i in range(n_iterations):
     print(scheduler.get_lr())
 
     if i % 5 == 0:
-        save_image(frame, f"debug/{i}.jpg", normalize=True)
+        save_image(frame, f"{opt.output_dir}/{i}.jpg", normalize=True)
         with torch.no_grad():
             for angle in [-0.3, 0, 0.3]:
                 img, _ = generator.staged_forward_with_frequencies(w_frequencies + w_frequency_offsets, w_phase_shifts + w_phase_shift_offsets, h_mean=(image_h + angle), max_batch_size=opt.max_batch_size, lock_view_dependence=True, **render_options)
-                save_image(img, f"debug/{i}_{angle}.jpg", normalize=True)
+                save_image(img, f"{opt.output_dir}/{i}_{angle}.jpg", normalize=True)
 
 trajectory = [] 
 for t in np.linspace(0, 1, 24):
@@ -141,7 +142,7 @@ for t in np.linspace(0, 1, opt.num_frames):
         
 # output_name = opt.output if opt.output else os.path.splitext(os.path.basename(opt.z))[0] + '.mp4'
 output_name = 'inverse_render.mp4'
-writer = skvideo.io.FFmpegWriter(os.path.join('debug', output_name), outputdict={'-pix_fmt': 'yuv420p', '-crf': '21'})
+writer = skvideo.io.FFmpegWriter(os.path.join(f'{opt.output_dir}', output_name), outputdict={'-pix_fmt': 'yuv420p', '-crf': '21'})
 
 # frames = []
 # depths = []
