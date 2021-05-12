@@ -65,7 +65,7 @@ options = {
 }
 
 render_options = {
-    'img_size': 512,
+    'img_size': 128,
     'fov': 30,
     'ray_start': 0.75,
     'ray_end': 1.25,
