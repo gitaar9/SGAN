@@ -137,12 +137,11 @@ for t in np.linspace(0, 1, opt.num_frames):
     yaw = (2 * math.pi * t) - (math.pi * 0.5)
     fov = 30
     trajectory.append((pitch, yaw))
-for t in np.linspace(0, 1, 24):
-    for t in np.linspace(0, 1, 24):
-        pitch = (math.pi / 2 * 85 / 90)
-        yaw = (2 * math.pi * t) - (math.pi * 0.5)
-        fov = 30
-        trajectory.append((pitch, yaw))
+for t in np.linspace(0, 1, opt.num_frames):
+    pitch = (math.pi / 2 * 85 / 90)
+    yaw = (2 * math.pi * t) - (math.pi * 0.5)
+    fov = 30
+    trajectory.append((pitch, yaw))
 
 # output_name = opt.output if opt.output else os.path.splitext(os.path.basename(opt.z))[0] + '.mp4'
 
