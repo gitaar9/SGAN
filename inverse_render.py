@@ -132,12 +132,12 @@ for i in range(n_iterations):
                     save_image(img, f"{opt.output_dir}/{i}_{angle}.jpg", normalize=True)
 
 trajectory = [] 
-for t in np.linspace(0, 1, opt.num_frames):
+for t in np.linspace(0, 1, opt.num_frames):  # Turn around the boat with shifting pitch
     pitch = ((math.pi / 2 * 85 / 90) * t)
     yaw = (2 * math.pi * t) - (math.pi * 0.5)
     fov = 30
     trajectory.append((pitch, yaw))
-for t in np.linspace(0, 1, opt.num_frames):
+for t in np.linspace(0, 1, opt.num_frames):  # Turn around the boat at lowest level pitch
     pitch = (math.pi / 2 * 85 / 90)
     yaw = (2 * math.pi * t) - (math.pi * 0.5)
     fov = 30
@@ -161,19 +161,19 @@ with torch.no_grad():
 
 output_name = 'inverse_render.gif'
 img, *imgs = frames
-img.save(fp=output_name, format='GIF', append_images=imgs,
-         save_all=True, duration=200, loop=0)
+img.save(fp=os.path.join(f'{opt.output_dir}', output_name), format='GIF', append_images=imgs,
+         save_all=True, duration=60, loop=0)
 
-output_name = 'inverse_render.mp4'
-writer = skvideo.io.FFmpegWriter(os.path.join(f'{opt.output_dir}', output_name), outputdict={'-pix_fmt': 'yuv420p', '-crf': '21'})
-
-frame_repeat = 2
-for frame in frames:
-    for _ in range(frame_repeat):
-        writer.writeFrame(np.array(frame))
-# for depth in depths:
-#     writer.writeFrame(np.array(depth))
-writer.close()
+# output_name = 'inverse_render.mp4'
+# writer = skvideo.io.FFmpegWriter(os.path.join(f'{opt.output_dir}', output_name), outputdict={'-pix_fmt': 'yuv420p', '-crf': '21'})
+#
+# frame_repeat = 2
+# for frame in frames:
+#     for _ in range(frame_repeat):
+#         writer.writeFrame(np.array(frame))
+# # for depth in depths:
+# #     writer.writeFrame(np.array(depth))
+# writer.close()
 
 
 #python inverse_render.py ../models/shapenetships_sym_loss_hierarchical_72900/ /home/gitaar9/AI/TNO/shapenet_renderer/ship_renders_train_upper_hemisphere_30_fov/1a2b1863733c2ca65e26ee427f1e5a4c/rgb/000015.png --num_frames=30 --max_batch_size=100000
