@@ -38,8 +38,8 @@ curriculum = {
     'ray_end': 1.25,
     'v_stddev': 0,
     'h_stddev': 0,
-    'h_mean': 0 + math.pi/2,
-    'v_mean': 0 + math.pi/2,
+    'h_mean': math.pi * 0.5,
+    'v_mean': math.pi / 4 * 85 / 90,
     'fov': 30,
     'lock_view_dependence': opt.lock_view_dependence,
     'white_back': True,
@@ -66,8 +66,10 @@ trajectory = []
 for t in np.linspace(0, 1, curriculum['num_frames']):
     # pitch = 0.2 * np.cos(t * 2 * math.pi) + math.pi/2  # these dont work
     # yaw = 0.4 * np.sin(t * 2 * math.pi) + math.pi/2
-    pitch = math.pi/2 * (1 - t)
-    yaw = 2 * math.pi * t
+    # pitch = math.pi/2 * (1 - t)
+    # yaw = 2 * math.pi * t
+    pitch = ((math.pi / 2 * 85 / 90) * t)
+    yaw = (2 * math.pi * t) - curriculum['h_mean']
     fov = 30
         
     trajectory.append((pitch, yaw, fov))

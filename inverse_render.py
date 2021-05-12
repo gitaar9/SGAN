@@ -116,9 +116,10 @@ for i in range(n_iterations):
     
     if i % 1 == 0:
         with torch.no_grad():
-            img, _ = generator.staged_forward_with_frequencies(w_frequencies + w_frequency_offsets, w_phase_shifts + w_phase_shift_offsets, h_mean=image_h, max_batch_size=opt.max_batch_size, lock_view_dependence=True, **render_options)
-            frames.append(tensor_to_PIL(img))
-            # frames.append(img[0].cpu().permute(1,2,0) * 0.5 + 0.5)
+            with torch.cuda.amp.autocast():
+                img, _ = generator.staged_forward_with_frequencies(w_frequencies + w_frequency_offsets, w_phase_shifts + w_phase_shift_offsets, h_mean=image_h, max_batch_size=opt.max_batch_size, lock_view_dependence=True, **render_options)
+                frames.append(tensor_to_PIL(img))
+                # frames.append(img[0].cpu().permute(1,2,0) * 0.5 + 0.5)
     
     scheduler.step()
     print(scheduler.get_lr())
@@ -126,9 +127,10 @@ for i in range(n_iterations):
     if i % 5 == 0:
         save_image(frame, f"{opt.output_dir}/{i}.jpg", normalize=True)
         with torch.no_grad():
-            for angle in [-0.3, 0, 0.3]:
-                img, _ = generator.staged_forward_with_frequencies(w_frequencies + w_frequency_offsets, w_phase_shifts + w_phase_shift_offsets, h_mean=(image_h + angle), max_batch_size=opt.max_batch_size, lock_view_dependence=True, **render_options)
-                save_image(img, f"{opt.output_dir}/{i}_{angle}.jpg", normalize=True)
+            with torch.cuda.amp.autocast():
+                for angle in [-0.3, 0, 0.3]:
+                    img, _ = generator.staged_forward_with_frequencies(w_frequencies + w_frequency_offsets, w_phase_shifts + w_phase_shift_offsets, h_mean=(image_h + angle), max_batch_size=opt.max_batch_size, lock_view_dependence=True, **render_options)
+                    save_image(img, f"{opt.output_dir}/{i}_{angle}.jpg", normalize=True)
 
 trajectory = [] 
 for t in np.linspace(0, 1, 24):
