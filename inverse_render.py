@@ -124,7 +124,7 @@ for i in range(n_iterations):
     scheduler.step()
     print(scheduler.get_lr())
 
-    if i % 5 == 0:
+    if i % 25 == 0:
         save_image(frame, f"{opt.output_dir}/{i}.jpg", normalize=True)
         with torch.no_grad():
             with torch.cuda.amp.autocast():
