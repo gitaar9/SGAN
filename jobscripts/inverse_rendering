@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#SBATCH --time=02:00:00
+#SBATCH --partition=gpushort
+#SBATCH --gres=gpu:v100:1
+#SBATCH --mem=32GB
+#SBATCH --job-name=inverse_render
+
+ml CUDA/10.2.89-GCC-8.3.0
+ml Python/3.7.4-GCCcore-8.3.0
+
+source /data/s2576597/SGAN/venv/bin/activate
+
+CUDA_VISIBLE_DEVICES=0 python -u  inverse_render.py good_generator_hier_sym_loss.pth inverse_images/inverse_goal.png --num_frames=128 --image_size=128

@@ -18,7 +18,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 parser = argparse.ArgumentParser()
 parser.add_argument('path', type=str)
 parser.add_argument('--seeds', nargs='+', default=[0, 1, 2])
-parser.add_argument('--output_dir', type=str, default='vids')
+parser.add_argument('--output_dir', type=str, default='images')
 parser.add_argument('--batch_size', type=int, default=1)
 parser.add_argument('--max_batch_size', type=int, default=2400000)
 parser.add_argument('--depth_map', action='store_true')
@@ -38,8 +38,8 @@ curriculum = {
     'ray_end': 1.25,
     'v_stddev': 0,
     'h_stddev': 0,
-    'h_mean': 0 + math.pi/2,
-    'v_mean': 0 + math.pi/2,
+    'h_mean': math.pi * 0.5,
+    'v_mean': math.pi / 4 * 85 / 90,
     'fov': 30,
     'lock_view_dependence': opt.lock_view_dependence,
     'white_back': True,
@@ -48,6 +48,11 @@ curriculum = {
     'nerf_noise': 0,
     'num_frames': opt.num_frames,
 }
+
+curriculum['v_mean'] += ((math.pi / 4 * 85 / 90) / 10) * 7
+curriculum['h_mean'] += (math.pi / 100) * 5
+
+print(f"v_mean: {curriculum['v_mean']}, h_mean: {curriculum['h_mean']}")
 
 
 def tensor_to_PIL(img):
@@ -62,17 +67,6 @@ ema.copy_to(generator.parameters())
 generator.set_device(device)
 generator.eval()
 
-trajectory = []
-for t in np.linspace(0, 1, curriculum['num_frames']):
-    # pitch = 0.2 * np.cos(t * 2 * math.pi) + math.pi/2  # these dont work
-    # yaw = 0.4 * np.sin(t * 2 * math.pi) + math.pi/2
-    pitch = math.pi/2 * (1 - t)
-    yaw = 2 * math.pi * t
-    fov = 30
-        
-    trajectory.append((pitch, yaw, fov))
-
-frame_repeat = 5
 
 for seed in opt.seeds:
     frames = []
@@ -84,18 +78,8 @@ for seed in opt.seeds:
     z = torch.randn(1, 256, device=device)
 
     with torch.no_grad():
-        for pitch, yaw, fov in tqdm(trajectory):
-            curriculum['h_mean'] = yaw #  + 3.14/2
-            curriculum['v_mean'] = pitch #  + 3.14/2
-            curriculum['fov'] = fov
-            curriculum['h_stddev'] = 0
-            curriculum['v_stddev'] = 0
-
-            frame, depth_map = generator.staged_forward(z, max_batch_size=opt.max_batch_size, depth_map=opt.depth_map, **curriculum)
-            frames.append(tensor_to_PIL(frame))
-
-        for frame in frames:
-            for _ in range(frame_repeat):
-                writer.writeFrame(np.array(frame))
-
-        writer.close()
+        frame, depth_map = generator.staged_forward(z, max_batch_size=opt.max_batch_size, depth_map=opt.depth_map, **curriculum)
+    frame = tensor_to_PIL(frame)
+    frame.show()
+    # Image.fromarray(frame, 'RGB').show()
+    # print(frame.shape)
