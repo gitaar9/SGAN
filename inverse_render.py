@@ -46,12 +46,13 @@ transform = transforms.Compose(
 
 gt_image = transform(gt_image).to(device).unsqueeze(0)
 
+lock_view_dependence = False
 image_h = 1.7549115333974483  # Speedboat 5
 image_v = 0.7326789041951802  # Speedboat 5
-image_h = -0.7012666066025517  # sailship 6
-image_v = 1.0182758041951803  # sailship 6
 image_h = 3.1917140533974484  # halfcontainer 9
 image_v = 0.8804224641951802  # halfcontainer 9
+image_h = -0.7012666066025517  # sailship 6
+image_v = 1.0182758041951803  # sailship 6
 
 
 options = {
@@ -123,7 +124,7 @@ for i in range(n_iterations):
     if i % 1 == 0:
         with torch.no_grad():
             with torch.cuda.amp.autocast():
-                img, _ = generator.staged_forward_with_frequencies(w_frequencies + w_frequency_offsets, w_phase_shifts + w_phase_shift_offsets, h_mean=image_h, max_batch_size=opt.max_batch_size, lock_view_dependence=True, **render_options)
+                img, _ = generator.staged_forward_with_frequencies(w_frequencies + w_frequency_offsets, w_phase_shifts + w_phase_shift_offsets, h_mean=image_h, max_batch_size=opt.max_batch_size, lock_view_dependence=lock_view_dependence, **render_options)
                 frames.append(tensor_to_PIL(img))
                 # frames.append(img[0].cpu().permute(1,2,0) * 0.5 + 0.5)
     
@@ -134,7 +135,7 @@ for i in range(n_iterations):
         with torch.no_grad():
             with torch.cuda.amp.autocast():
                 for angle in [-0.3, 0, 0.3]:
-                    img, _ = generator.staged_forward_with_frequencies(w_frequencies + w_frequency_offsets, w_phase_shifts + w_phase_shift_offsets, h_mean=(image_h + angle), max_batch_size=opt.max_batch_size, lock_view_dependence=True, **render_options)
+                    img, _ = generator.staged_forward_with_frequencies(w_frequencies + w_frequency_offsets, w_phase_shifts + w_phase_shift_offsets, h_mean=(image_h + angle), max_batch_size=opt.max_batch_size, lock_view_dependence=lock_view_dependence, **render_options)
                     save_image(img, f"{opt.output_dir}/{i}_{angle}.jpg", normalize=True)
 
 trajectory = [] 
@@ -160,7 +161,7 @@ with torch.no_grad():
         render_options['h_mean'] = yaw
         render_options['v_mean'] = pitch
         with torch.cuda.amp.autocast():
-            frame, depth_map = generator.staged_forward_with_frequencies(w_frequencies + w_frequency_offsets, w_phase_shifts + w_phase_shift_offsets, max_batch_size=opt.max_batch_size, lock_view_dependence=True, **render_options)
+            frame, depth_map = generator.staged_forward_with_frequencies(w_frequencies + w_frequency_offsets, w_phase_shifts + w_phase_shift_offsets, max_batch_size=opt.max_batch_size, lock_view_dependence=lock_view_dependence, **render_options)
             frames.append(tensor_to_PIL(frame))
             # depths.append(tensor_to_PIL(depth_map))
 
