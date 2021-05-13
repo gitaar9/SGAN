@@ -48,6 +48,12 @@ gt_image = transform(gt_image).to(device).unsqueeze(0)
 
 image_h = 1.7549115333974483  # Speedboat 5
 image_v = 0.7326789041951802  # Speedboat 5
+image_h = -0.7012666066025517  # sailship 6
+image_v = 1.0182758041951803  # sailship 6
+image_h = 3.1917140533974484  # halfcontainer 9
+image_v = 0.8804224641951802  # halfcontainer 9
+
+
 options = {
     'img_size': opt.image_size,
     'fov': 30,
@@ -65,7 +71,7 @@ options = {
 }
 
 render_options = {
-    'img_size': 256,
+    'img_size': 128,
     'fov': 30,
     'ray_start': 0.75,
     'ray_end': 1.25,

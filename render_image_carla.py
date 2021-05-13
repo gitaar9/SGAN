@@ -52,12 +52,21 @@ curriculum = {
 curriculum['v_mean'] += ((math.pi / 4 * 85 / 90) / 10) * 7
 curriculum['h_mean'] += (math.pi / 100) * 5
 
-yaw_from_renderer = -0.96951337  # 05
-pitch_from_renderer = 0.75085096   # 05
+# yaw_from_renderer = -0.96951337  # 05
+# pitch_from_renderer = 0.75085096   # 05
 # yaw_from_renderer = 3.0204208   # 04
 # pitch_from_renderer = 1.12459522   # 04
 # yaw_from_renderer = 0.55698457   # 03
 # pitch_from_renderer = 0.19000018   # 03
+
+yaw_from_renderer = 1.48666477  # 06 sailship
+pitch_from_renderer = 0.46525406   # 06 sailship
+yaw_from_renderer = -2.40631589  # 09 halfcontainer
+pitch_from_renderer = 0.6031074   # 09 halfcontainer
+yaw_from_renderer = -1.86428757  # 08 romanrow
+pitch_from_renderer = 0.64206937   # 08 romanrow
+
+
 curriculum['v_mean'] = (math.pi / 2 * 85 / 90) - pitch_from_renderer
 curriculum['h_mean'] = -yaw_from_renderer + (math.pi * 0.75) - (0.5 * math.pi)
 
