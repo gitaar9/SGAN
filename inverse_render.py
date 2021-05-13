@@ -47,12 +47,15 @@ transform = transforms.Compose(
 gt_image = transform(gt_image).to(device).unsqueeze(0)
 
 lock_view_dependence = False
-image_h = 1.7549115333974483  # Speedboat 5
-image_v = 0.7326789041951802  # Speedboat 5
-image_h = 3.1917140533974484  # halfcontainer 9
-image_v = 0.8804224641951802  # halfcontainer 9
-image_h = -0.7012666066025517  # sailship 6
-image_v = 1.0182758041951803  # sailship 6
+if "halfcontainership" in opt.image_path:
+    image_h = 3.1917140533974484  # halfcontainer 9
+    image_v = 0.8804224641951802  # halfcontainer 9
+elif "sailship" in opt.image_path:
+    image_h = -0.7012666066025517  # sailship 6
+    image_v = 1.0182758041951803  # sailship 6
+else:
+    image_h = 1.7549115333974483  # Speedboat 5
+    image_v = 0.7326789041951802  # Speedboat 5
 
 
 options = {
