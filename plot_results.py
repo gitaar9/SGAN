@@ -271,6 +271,7 @@ def download_model_files(password, run_name):
         "discriminator.pth",
         "scaler.pth"
     ]
+    files = ["12--14:42--" + f for f in files]
     os.system(f"mkdir {l_location}")
     for file_name in files:
         print(f"Downloading {p_location + file_name}")
@@ -279,10 +280,10 @@ def download_model_files(password, run_name):
 
 def main():
     password = getpass()
-    snships_mirror_l2_hierarchical(password)
+    # snships_mirror_l2_hierarchical(password)
     # snships_mirror_l2(password)
     # carla_cars_mirror(password)
-    download_model_files(password, 'shapenetships_sym_loss_hierarchical')
+    # download_model_files(password, 'shapenetships_sym_loss_hierarchical')
 
 
 if __name__ == '__main__':

@@ -46,8 +46,8 @@ transform = transforms.Compose(
 
 gt_image = transform(gt_image).to(device).unsqueeze(0)
 
-image_h = 1.7278759594743862
-image_v = 1.2610003845659032
+image_h = 1.7549115333974483  # Speedboat 5
+image_v = 0.7326789041951802  # Speedboat 5
 options = {
     'img_size': opt.image_size,
     'fov': 30,
@@ -59,13 +59,13 @@ options = {
     'h_mean': image_h,
     'v_mean': image_v,
     'hierarchical_sample': True,
-    'sample_dist': 'uniform',
+    'sample_dist': None,
     'clamp_mode': 'relu',
     'nerf_noise': 0,
 }
 
 render_options = {
-    'img_size': 128,
+    'img_size': 256,
     'fov': 30,
     'ray_start': 0.75,
     'ray_end': 1.25,
@@ -162,18 +162,18 @@ with torch.no_grad():
 output_name = 'inverse_render.gif'
 img, *imgs = frames
 img.save(fp=os.path.join(f'{opt.output_dir}', output_name), format='GIF', append_images=imgs,
-         save_all=True, duration=60, loop=0)
+         save_all=True, duration=45, loop=0, interlace=False)
 
-# output_name = 'inverse_render.mp4'
-# writer = skvideo.io.FFmpegWriter(os.path.join(f'{opt.output_dir}', output_name), outputdict={'-pix_fmt': 'yuv420p', '-crf': '21'})
-#
-# frame_repeat = 2
-# for frame in frames:
-#     for _ in range(frame_repeat):
-#         writer.writeFrame(np.array(frame))
-# # for depth in depths:
-# #     writer.writeFrame(np.array(depth))
-# writer.close()
+output_name = 'inverse_render.avi'
+writer = skvideo.io.FFmpegWriter(os.path.join(f'{opt.output_dir}', output_name), outputdict={'-pix_fmt': 'yuv420p', '-crf': '21'})
+
+frame_repeat = 2
+for frame in frames:
+    for _ in range(frame_repeat):
+        writer.writeFrame(np.array(frame))
+# for depth in depths:
+#     writer.writeFrame(np.array(depth))
+writer.close()
 
 
 #python inverse_render.py ../models/shapenetships_sym_loss_hierarchical_72900/ /home/gitaar9/AI/TNO/shapenet_renderer/ship_renders_train_upper_hemisphere_30_fov/1a2b1863733c2ca65e26ee427f1e5a4c/rgb/000015.png --num_frames=30 --max_batch_size=100000

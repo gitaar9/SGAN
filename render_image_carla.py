@@ -52,6 +52,17 @@ curriculum = {
 curriculum['v_mean'] += ((math.pi / 4 * 85 / 90) / 10) * 7
 curriculum['h_mean'] += (math.pi / 100) * 5
 
+yaw_from_renderer = -0.96951337  # 05
+pitch_from_renderer = 0.75085096   # 05
+# yaw_from_renderer = 3.0204208   # 04
+# pitch_from_renderer = 1.12459522   # 04
+# yaw_from_renderer = 0.55698457   # 03
+# pitch_from_renderer = 0.19000018   # 03
+curriculum['v_mean'] = (math.pi / 2 * 85 / 90) - pitch_from_renderer
+curriculum['h_mean'] = -yaw_from_renderer + (math.pi * 0.75) - (0.5 * math.pi)
+
+print(f"Pi-GAN space v_mean: {curriculum['v_mean']}, h_mean: {curriculum['h_mean']}")
+
 print(f"v_mean: {curriculum['v_mean']}, h_mean: {curriculum['h_mean']}")
 
 
