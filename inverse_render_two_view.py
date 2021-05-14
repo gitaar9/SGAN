@@ -126,6 +126,7 @@ for i in range(n_iterations):
             w_phase_shifts + noise_w_phase_shifts + w_phase_shift_offsets,
             h_mean=image_h,
             v_mean=image_v,
+            lock_view_dependence=lock_view_dependence,
             **options
         )
         frame_2, _ = generator.forward_with_frequencies(
@@ -133,6 +134,7 @@ for i in range(n_iterations):
             w_phase_shifts + noise_w_phase_shifts + w_phase_shift_offsets,
             h_mean=image_h_2,
             v_mean=image_v_2,
+            lock_view_dependence=lock_view_dependence,
             **options
         )
     both_frames = torch.cat((frame, frame_2), dim=0)
