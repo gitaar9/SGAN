@@ -11,6 +11,10 @@ ml Python/3.7.4-GCCcore-8.3.0
 
 source /data/s2576597/SGAN/venv/bin/activate
 
-CUDA_VISIBLE_DEVICES=0 python -u  inverse_render.py good_generator_hier_sym_loss.pth inverse_images/speedboat/inverse_goal.png --num_frames=128 --image_size=128 --output_dir=inverse_images/speedboat
-CUDA_VISIBLE_DEVICES=0 python -u  inverse_render.py good_generator_hier_sym_loss.pth inverse_images/halfcontainership/inverse_goal.png --num_frames=128 --image_size=128 --output_dir=inverse_images/halfcontainership
-CUDA_VISIBLE_DEVICES=0 python -u  inverse_render.py good_generator_hier_sym_loss.pth inverse_images/sailship/inverse_goal.png --num_frames=128 --image_size=128 --output_dir=inverse_images/sailship
+#CUDA_VISIBLE_DEVICES=0 python -u  inverse_render.py good_generator_hier_sym_loss.pth inverse_images/speedboat/inverse_goal.png --num_frames=128 --image_size=128 --output_dir=inverse_images/speedboat
+#CUDA_VISIBLE_DEVICES=0 python -u  inverse_render.py good_generator_hier_sym_loss.pth inverse_images/halfcontainership/inverse_goal.png --num_frames=128 --image_size=128 --output_dir=inverse_images/halfcontainership
+#CUDA_VISIBLE_DEVICES=0 python -u  inverse_render.py good_generator_hier_sym_loss.pth inverse_images/sailship/inverse_goal.png --num_frames=128 --image_size=128 --output_dir=inverse_images/sailship
+
+
+CUDA_VISIBLE_DEVICES=0 python -u  inverse_render_two_view.py good_generator_hier_sym_loss.pth inverse_images/speedboat/inverse_goal.png --num_frames=128 --image_size=128 --output_dir=inverse_images/speedboat
+CUDA_VISIBLE_DEVICES=0 python -u  inverse_render_two_view.py good_generator_hier_sym_loss.pth inverse_images/halfcontainership/inverse_goal.png --num_frames=128 --image_size=128 --output_dir=inverse_images/halfcontainership
