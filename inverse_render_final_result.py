@@ -159,7 +159,7 @@ def main(opt, device):
 
     frames = []
 
-    n_iterations = 200
+    n_iterations = 700
 
     for idx in range(opt.n_input_views):
         save_image(gt_images[idx], f"{opt.output_dir}/gt{idx}.jpg", normalize=True)
@@ -175,14 +175,14 @@ def main(opt, device):
                     w_phase_shifts + noise_w_phase_shifts + w_phase_shift_offsets,
                     h_mean=gt_h_means[idx],
                     v_mean=gt_v_means[idx],
-                    lock_view_dependence=lock_view_dependence,
+                    lock_view_dependence=lock_view_dependence and opt.use_view_lock_for_optimization,
                     **options
                 )
                 all_frames.append(frame)
 
         all_frames = torch.cat(all_frames, dim=0)
-        loss = torch.nn.L1Loss()(all_frames, gt_images)
-        # loss = torch.nn.MSELoss()(frame, gt_image)
+        # loss = torch.nn.L1Loss()(all_frames, gt_images)
+        loss = torch.nn.MSELoss()(all_frames, gt_images)
         loss = loss.mean()
 
         print(f"{i + 1}/{n_iterations}: {loss.item()} {scheduler.get_lr()}")
@@ -237,7 +237,7 @@ def main(opt, device):
     frames.extend(additional_frames)
 
     create_gif(frames, opt.output_dir)
-    create_mp4(frames, opt.output_dir)
+    # create_mp4(frames, opt.output_dir)
 
 
 if __name__ == '__main__':
@@ -252,6 +252,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_frames', type=int, default=128)
     parser.add_argument('--max_batch_size', type=int, default=2400000)
     parser.add_argument('--n_input_views', type=int, default=1)
+    parser.add_argument('--use_view_lock_for_optimization', action='store_true')
 
     opt = parser.parse_args()
     Path(opt.output_dir).mkdir(parents=True, exist_ok=True)
