@@ -261,7 +261,7 @@ def snships_mirror_l2_hierarchical(password):
 def download_model_files(password, run_name):
     peregrine_adress = 'sshpass -p "{}" scp s2576597@peregrine.hpc.rug.nl:{} {}'
     p_location = '/data/s2576597/SGAN/{}/'.format(run_name)
-    l_location = '/samsung_hdd/Files/AI/TNO/S-GAN-prerelease/models/{}_72900/'.format(run_name)
+    l_location = '/samsung_hdd/Files/AI/TNO/S-GAN-prerelease/models/{}/'.format(run_name)
     files = [
         "ema2.pth",
         "ema.pth",
@@ -271,7 +271,6 @@ def download_model_files(password, run_name):
         "discriminator.pth",
         "scaler.pth"
     ]
-    files = ["12--14:42--" + f for f in files]
     os.system(f"mkdir {l_location}")
     for file_name in files:
         print(f"Downloading {p_location + file_name}")
@@ -338,7 +337,7 @@ def main():
     sncar_mirror_l2_hierarchical(password)
     # snships_mirror_l2(password)
     # carla_cars_mirror(password)
-    # download_model_files(password, 'shapenetships_sym_loss_hierarchical')
+    # download_model_files(password, 'shapenetcars_sym_loss_hierarchical')
 
 
 if __name__ == '__main__':
