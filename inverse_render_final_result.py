@@ -181,8 +181,8 @@ def main(opt, device):
                 all_frames.append(frame)
 
         all_frames = torch.cat(all_frames, dim=0)
-        # loss = torch.nn.L1Loss()(all_frames, gt_images)
-        loss = torch.nn.MSELoss()(all_frames, gt_images)
+        loss = torch.nn.L1Loss()(all_frames, gt_images)
+        # loss = torch.nn.MSELoss()(all_frames, gt_images)
         loss = loss.mean()
 
         print(f"{i + 1}/{n_iterations}: {loss.item()} {scheduler.get_lr()}")
