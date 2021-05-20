@@ -102,6 +102,7 @@ def main(opt, device):
 
     if opt.seed is not None:
         torch.manual_seed(opt.seed)
+        torch.manual_seed(0)
 
     lock_view_dependence = True
 
@@ -130,6 +131,7 @@ def main(opt, device):
         'sample_dist': None,
         'clamp_mode': 'relu',
         'nerf_noise': 0,
+        'white_back': True
     }
 
     render_options = {
@@ -144,6 +146,7 @@ def main(opt, device):
         'sample_dist': None,
         'clamp_mode': 'relu',
         'nerf_noise': 0,
+        'white_back': True
     }
 
     w_frequencies, w_phase_shifts = get_average_frequencies(generator)
