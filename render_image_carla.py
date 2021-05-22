@@ -65,10 +65,12 @@ yaw_from_renderer = -0.99701956  # 03 halfcontainer
 pitch_from_renderer = 0.32446663   # 03 halfcontainer
 # yaw_from_renderer = -1.86428757  # 08 romanrow
 # pitch_from_renderer = 0.64206937   # 08 romanrow
+yaw_from_renderer = -math.pi/2
+pitch_from_renderer = math.radians(35)
 
 
 curriculum['v_mean'] = (math.pi / 2 * 85 / 90) - pitch_from_renderer
-curriculum['h_mean'] = -yaw_from_renderer + (math.pi * 0.75) - (0.5 * math.pi)
+curriculum['h_mean'] = -yaw_from_renderer + (math.pi * 0.75) - (0.5 * math.pi) - (math.pi / 100) * 64
 
 print(f"Pi-GAN space v_mean: {curriculum['v_mean']}, h_mean: {curriculum['h_mean']}")
 
@@ -81,9 +83,9 @@ def tensor_to_PIL(img):
 
 
 generator = torch.load(opt.path, map_location=torch.device(device))
-ema_file = opt.path.split('generator')[0] + 'ema.pth'
-ema = torch.load(ema_file)
-ema.copy_to(generator.parameters())
+# ema_file = opt.path.split('generator')[0] + 'ema.pth'
+# ema = torch.load(ema_file)
+# ema.copy_to(generator.parameters())
 generator.set_device(device)
 generator.eval()
 
