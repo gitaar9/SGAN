@@ -53,7 +53,7 @@ def main():
     car_ids = ['1b1a7af332f8f154487edd538b3d83f6', '1c3c8952b92d567e61c6c61410fc904b',
                '1cb95c00d3bf6a3a58dbdf2b5c6acfca', '1f7393970917e558b4a20251cec15600']
     car_ids = ['minicooper', 'peugot', 'pickup', 'rapide']
-    car_ids = ['rapide']
+    # car_ids = ['rapide']
 
     for car_id in car_ids:
         gt_folder = f'/samsung_hdd/Files/AI/TNO/S-GAN-prerelease/S-GAN-real_prerelease/inverse_images/cars/{car_id}/rgb'
