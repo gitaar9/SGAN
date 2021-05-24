@@ -55,7 +55,8 @@ def main():
 
     for car_id in car_ids:
         gt_folder = f'/samsung_hdd/Files/AI/TNO/S-GAN-prerelease/S-GAN-real_prerelease/inverse_images/cars/{car_id}/rgb'
-        result_folder = f'/samsung_hdd/Files/AI/TNO/S-GAN-prerelease/S-GAN-real_prerelease/inverse_images/l1/white_back/cars_inference_2view/{car_id}'
+        # result_folder = f'/samsung_hdd/Files/AI/TNO/S-GAN-prerelease/S-GAN-real_prerelease/inverse_images/l1/white_back/cars_inference/{car_id}'
+        result_folder = f'/samsung_hdd/Files/AI/TNO/S-GAN-prerelease/S-GAN-real_prerelease/inverse_images/l1/white_back/no_mirror/cars_inference/{car_id}'
         ssims = calculate_ssim_for_folder(result_folder, gt_folder, amount_of_images, last_epoch, img_size)
 
         print(f"Sims for {car_id}: {ssims}|| Mean: {(ssims[2] + ssims[3]) / 2}")
