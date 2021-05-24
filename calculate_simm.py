@@ -52,14 +52,16 @@ def main():
 
     car_ids = ['1b1a7af332f8f154487edd538b3d83f6', '1c3c8952b92d567e61c6c61410fc904b',
                '1cb95c00d3bf6a3a58dbdf2b5c6acfca', '1f7393970917e558b4a20251cec15600']
+    car_ids = ['minicooper', 'peugot', 'pickup', 'rapide']
 
     for car_id in car_ids:
         gt_folder = f'/samsung_hdd/Files/AI/TNO/S-GAN-prerelease/S-GAN-real_prerelease/inverse_images/cars/{car_id}/rgb'
-        # result_folder = f'/samsung_hdd/Files/AI/TNO/S-GAN-prerelease/S-GAN-real_prerelease/inverse_images/l1/white_back/cars_inference/{car_id}'
-        result_folder = f'/samsung_hdd/Files/AI/TNO/S-GAN-prerelease/S-GAN-real_prerelease/inverse_images/l1/white_back/no_mirror/cars_inference/{car_id}'
+        result_folder = f'/samsung_hdd/Files/AI/TNO/S-GAN-prerelease/S-GAN-real_prerelease/inverse_images/l1/white_back/cars_inference/{car_id}'
+        # result_folder = f'/samsung_hdd/Files/AI/TNO/S-GAN-prerelease/S-GAN-real_prerelease/inverse_images/l1/white_back/no_mirror/cars_inference/{car_id}'
         ssims = calculate_ssim_for_folder(result_folder, gt_folder, amount_of_images, last_epoch, img_size)
 
-        print(f"Sims for {car_id}: {ssims}|| Mean: {(ssims[2] + ssims[3]) / 2}")
+        # print(f"Sims for {car_id}: {ssims}|| Mean: {sum(ssims[1:]) / len(ssims[1:])}")
+        print("Sims for {}: {}|| Mean: {:.3f}".format(car_id, ssims, sum(ssims[1:]) / len(ssims[1:])))
 
 
 if __name__ == '__main__':
