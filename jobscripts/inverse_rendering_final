@@ -11,11 +11,11 @@ ml Python/3.7.4-GCCcore-8.3.0
 
 source /data/s2576597/SGAN/venv/bin/activate
 
-CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetcars_sym_loss_hierarchical/17--20:36--generator.pth inverse_images/cars/real_images/minicooper/ --num_frames=128 --image_size=128 --output_dir=inverse_images/l2/real/cars_inference/minicooper/ --use_view_lock_for_optimization
+#CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetcars_sym_loss_hierarchical/17--20:36--generator.pth inverse_images/cars/real_images/minicooper/ --num_frames=128 --image_size=128 --output_dir=inverse_images/l2/real/cars_inference/minicooper/ --use_view_lock_for_optimization
 CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetcars_sym_loss_hierarchical/17--20:36--generator.pth inverse_images/cars/real_images/mustang/ --num_frames=128 --image_size=128 --output_dir=inverse_images/l2/real/cars_inference/mustang/ --use_view_lock_for_optimization
 
-CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetcars_no_mirror/21--22:03--generator.pth inverse_images/cars/real_images/minicooper/ --num_frames=128 --image_size=128 --output_dir=inverse_images/l2/real/no_mirror/cars_inference/minicooper/ --use_view_lock_for_optimization --change_yaw
-CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetcars_no_mirror/21--22:03--generator.pth inverse_images/cars/real_images/mustang/ --num_frames=128 --image_size=128 --output_dir=inverse_images/l2/real/no_mirror/cars_inference/mustang/ --use_view_lock_for_optimization --change_yaw
+#CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetcars_no_mirror/21--22:03--generator.pth inverse_images/cars/real_images/minicooper/ --num_frames=128 --image_size=128 --output_dir=inverse_images/l2/real/no_mirror/cars_inference/minicooper/ --use_view_lock_for_optimization --change_yaw
+#CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetcars_no_mirror/21--22:03--generator.pth inverse_images/cars/real_images/mustang/ --num_frames=128 --image_size=128 --output_dir=inverse_images/l2/real/no_mirror/cars_inference/mustang/ --use_view_lock_for_optimization --change_yaw
 
 #CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetcars_sym_loss_hierarchical/17--20:36--generator.pth inverse_images/cars/rapide/ --num_frames=128 --image_size=128 --output_dir=inverse_images/l2/cars_inference/rapide/ --use_view_lock_for_optimization
 #CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetcars_sym_loss_hierarchical/17--20:36--generator.pth inverse_images/cars/peugot/ --num_frames=128 --image_size=128 --output_dir=inverse_images/l2/cars_inference/peugot/ --use_view_lock_for_optimization
