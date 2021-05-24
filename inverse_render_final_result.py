@@ -114,8 +114,8 @@ def main(opt, device):
     img_pitches = [math.radians(35), math.radians(35), math.radians(35), math.radians(85)]
 
     image_h_means = [-yaw_from_renderer + (math.pi * 0.75) - (0.5 * math.pi) for yaw_from_renderer in img_yaws]
-    # For new no mirror generator add this:
-    image_h_means = [h - (math.pi / 100) * 64 for h in image_h_means]
+    if opt.change_yaw:  # For new no mirror generator add this
+        image_h_means = [h - (math.pi / 100) * 64 for h in image_h_means]
     image_v_means = [(math.pi / 2 * 85 / 90) - pitch_from_renderer for pitch_from_renderer in img_pitches]
 
     gt_h_means = image_h_means[:opt.n_input_views]
@@ -258,6 +258,7 @@ if __name__ == '__main__':
     parser.add_argument('--max_batch_size', type=int, default=2400000)
     parser.add_argument('--n_input_views', type=int, default=1)
     parser.add_argument('--use_view_lock_for_optimization', action='store_true')
+    parser.add_argument('--change_yaw', action='store_true')
 
     opt = parser.parse_args()
     Path(opt.output_dir).mkdir(parents=True, exist_ok=True)
