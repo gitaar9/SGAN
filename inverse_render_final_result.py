@@ -115,7 +115,7 @@ def main(opt, device):
 
     image_h_means = [-yaw_from_renderer + (math.pi * 0.75) - (0.5 * math.pi) for yaw_from_renderer in img_yaws]
     # For new no mirror generator add this:
-    # image_h_means = [h - (math.pi / 100) * 64 for h in image_h_means]
+    image_h_means = [h - (math.pi / 100) * 64 for h in image_h_means]
     image_v_means = [(math.pi / 2 * 85 / 90) - pitch_from_renderer for pitch_from_renderer in img_pitches]
 
     gt_h_means = image_h_means[:opt.n_input_views]
