@@ -458,11 +458,11 @@ SHAPENETSHIPS_SYM_LOSS_HIERARCHICAL = {
     0: {'batch_size': 30, 'num_steps': 30, 'img_size': 32, 'batch_split': 1, 'gen_lr': 4e-5, 'disc_lr': 4e-4},
     int(10e3): {'batch_size': 30, 'num_steps': 30, 'img_size': 32, 'batch_split': 1, 'gen_lr': 2e-5, 'disc_lr': 2e-4},
 
-    int(30e3): {'batch_size': 16, 'num_steps': 30, 'img_size': 64, 'batch_split': 2, 'gen_lr': 2e-5, 'disc_lr': 2e-4},
-    int(50e3): {'batch_size': 16, 'num_steps': 30, 'img_size': 64, 'batch_split': 2, 'gen_lr': 1e-5, 'disc_lr': 1e-4},
+    int(30e3): {'batch_size': 8, 'num_steps': 30, 'img_size': 64, 'batch_split': 1, 'gen_lr': 2e-5, 'disc_lr': 2e-4},
+    int(50e3): {'batch_size': 8, 'num_steps': 30, 'img_size': 64, 'batch_split': 1, 'gen_lr': 1e-5, 'disc_lr': 1e-4},
+    int(60e3): {'batch_size': 8, 'num_steps': 30, 'img_size': 64, 'batch_split': 1, 'gen_lr': 5e-6, 'disc_lr': 5e-5},
 
-    int(75e3): {'batch_size': 16, 'num_steps': 30, 'img_size': 128, 'batch_split': 8, 'gen_lr': 3e-6,
-                'disc_lr': 3e-5},
+    int(75e3): {'batch_size': 2, 'num_steps': 30, 'img_size': 128, 'batch_split': 1, 'gen_lr': 6e-7, 'disc_lr': 6e-6},
     # int(200e3): {},
 
     'fov': 30,

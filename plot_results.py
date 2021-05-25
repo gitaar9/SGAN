@@ -84,6 +84,8 @@ def plot_simple_torch_array_file(dataset_names, file_path, *args, **kwargs):
 def plot_pi_gan_plots(local_names, *args, **kwargs):
     fid_path = 'mirror_loss_results/sgan_{}_fid.txt'
 
+    plt.axvline(x=30000, color='red', linestyle=':')
+    plt.axvline(x=75000, color='red', linestyle=':')
     all_plotting(
         local_names,
         fid_path,
