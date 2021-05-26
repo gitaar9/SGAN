@@ -153,6 +153,7 @@ def train(opt):
             if discriminator.step % opt.model_save_interval == 0:
                 now = datetime.now()
                 now = now.strftime("%d--%H:%M--")
+                now = now + '_' + str(discriminator.step) + '--'
                 torch.save(ema, os.path.join(opt.output_dir, now + 'ema.pth'))
                 torch.save(ema2, os.path.join(opt.output_dir, now + 'ema2.pth'))
                 torch.save(generator, os.path.join(opt.output_dir, now + 'generator.pth'))
