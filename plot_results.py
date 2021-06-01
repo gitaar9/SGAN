@@ -333,10 +333,66 @@ def sncar_mirror_l2_hierarchical(password):
     plt.show()
 
 
+def new_snship_runs(password):
+    # FID plot
+    local_names = ['carla_sym_loss_hierarchical_v2', 'shapenetships_sym_loss_hierarchical_v2', 'shapenetships_no_mirror_v2']
+    peregrine_names = ['carla_sym_loss_hierarchical_v2', 'shapenetships_sym_loss_hierarchical_v2', 'shapenetships_no_mirror_v2']
+    if password:
+        download_files_from_peregrine(
+            password=password,
+            peregrine_names=peregrine_names,
+            local_names=local_names,
+            peregrine_path='/data/s2576597/SGAN/{}/fid.txt',
+            local_path='mirror_loss_results/sgan_{}_fid.txt'
+        )
+    plt.figure(0)
+    plot_pi_gan_plots(local_names)
+
+    # Sym loss plot
+    if password:
+        download_files_from_peregrine(
+            password=password,
+            peregrine_names=peregrine_names,
+            local_names=local_names,
+            peregrine_path='/data/s2576597/SGAN/{}/generator_sym.losses',
+            local_path='mirror_loss_results/sgan_{}_generator_sym.losses'
+        )
+    plt.figure(1)
+    plot_simple_torch_array_file(['shapenetcars_baseline_hierarchical', 'shapenetcars_sym_loss_hierarchical'], 'mirror_loss_results/sgan_{}_generator_sym.losses', 'Sym loss', 'time', 'loss')
+
+    # Gen loss plot
+    if password:
+        download_files_from_peregrine(
+            password=password,
+            peregrine_names=peregrine_names,
+            local_names=local_names,
+            peregrine_path='/data/s2576597/SGAN/{}/generator.losses',
+            local_path='mirror_loss_results/sgan_{}_generator.losses'
+        )
+    plt.figure(2)
+    plot_simple_torch_array_file(local_names, 'mirror_loss_results/sgan_{}_generator.losses', 'Gen loss', 'time', 'loss')
+
+    # Max GPU memory
+    if password:
+        download_files_from_peregrine(
+            password=password,
+            peregrine_names=peregrine_names,
+            local_names=local_names,
+            peregrine_path='/data/s2576597/SGAN/{}/max_memories.sizes',
+            local_path='mirror_loss_results/sgan_{}_max_memories.sizes'
+        )
+    plt.figure(3)
+    local_names = local_names[:2]
+    plot_simple_torch_array_file(local_names, 'mirror_loss_results/sgan_{}_max_memories.sizes', 'Max GPU mem', 'time', 'Memory')
+
+    plt.show()
+
+
 def main():
     password = getpass()
+    new_snship_runs(password)
     # snships_mirror_l2_hierarchical(password)
-    sncar_mirror_l2_hierarchical(password)
+    # sncar_mirror_l2_hierarchical(password)
     # snships_mirror_l2(password)
     # carla_cars_mirror(password)
     # download_model_files(password, 'shapenetcars_sym_loss_hierarchical')
