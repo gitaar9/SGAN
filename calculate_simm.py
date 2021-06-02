@@ -19,8 +19,12 @@ def show_gt_generated_image_samples(generated_image_paths, gt_image_paths, image
         gt_image = cv2.resize(gt_image, (image_size, image_size), interpolation=cv2.INTER_CUBIC)
         gt_images.append(gt_image)
     image = np.vstack([np.hstack(gen_images), np.hstack(gt_images)])
-    cv2.imshow('image', image.astype(np.uint8))  # Show the image
-    cv2.waitKey(0)
+    # You may need to convert the color.
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    im_pil = Image.fromarray(image)
+    im_pil.show()
+    # cv2.imshow('image', image.astype(np.uint8))  # Show the image
+    # cv2.waitKey(0)
 
 
 def load_image_from_paths(img_paths, img_size=128):
@@ -83,35 +87,40 @@ def old_main():
 
 
 def main():
-    output_folder = '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output/car_view_synthesis_test_set_output'
-    output_folder = '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_350/car_view_synthesis_test_set_output_350'
+
+    output_folders = [
+        '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output/car_view_synthesis_test_set_output',
+        '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_350/car_view_synthesis_test_set_output_350',
+        '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock/car_view_synthesis_test_set_output_no_view_lock'
+    ]
     reference_folder = '/samsung_hdd/Files/AI/TNO/shapenet_renderer/car_view_synthesis_test_set'
     img_size = 128
 
-    object_folders = glob.glob(os.path.join(output_folder, '*'))
+    for output_folder in output_folders:
+        object_folders = glob.glob(os.path.join(output_folder, '*'))
 
-    generated_images_paths = [os.path.join(p, 'rgb', '0.png') for p in object_folders]
-    generated_images = load_image_from_paths(generated_images_paths, img_size)
+        generated_images_paths = [os.path.join(p, 'rgb', '0.png') for p in object_folders]
+        generated_images = load_image_from_paths(generated_images_paths, img_size)
 
-    objects_ids = [p.split('/')[-1] for p in object_folders]
-    ground_truth_image_paths = [os.path.join(reference_folder, o_id, 'rgb', '000001.png') for o_id in objects_ids]
-    ground_truth_images = load_image_from_paths(ground_truth_image_paths, img_size)
+        objects_ids = [p.split('/')[-1] for p in object_folders]
+        ground_truth_image_paths = [os.path.join(reference_folder, o_id, 'rgb', '000001.png') for o_id in objects_ids]
+        ground_truth_images = load_image_from_paths(ground_truth_image_paths, img_size)
 
-    ssims = []
-    for generated_image, gt_image in zip(generated_images, ground_truth_images):
-        ssim = metrics.structural_similarity(
-            generated_image,
-            gt_image,
-            multichannel=True,
-            data_range=2,
-        )
-        ssims.append(ssim)
+        ssims = []
+        for generated_image, gt_image in zip(generated_images, ground_truth_images):
+            ssim = metrics.structural_similarity(
+                generated_image,
+                gt_image,
+                multichannel=True,
+                data_range=2,
+            )
+            ssims.append(ssim)
 
-    ssims = np.asarray(ssims)
-    print(ssims)
-    print(f"Average SSIM over {len(generated_images)} images: {np.mean(ssims):.3f}:{np.std(ssims):.3f}")
+        ssims = np.asarray(ssims)
+        print(ssims)
+        print(f"Average SSIM over {len(generated_images)} images: {np.mean(ssims):.3f}:{np.std(ssims):.3f}")
 
-    show_gt_generated_image_samples(generated_images_paths, ground_truth_image_paths[:len(generated_images_paths)])
+        # show_gt_generated_image_samples(generated_images_paths, ground_truth_image_paths[:len(generated_images_paths)])
 
 
 if __name__ == '__main__':

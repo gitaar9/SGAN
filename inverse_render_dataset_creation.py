@@ -20,7 +20,7 @@ def main(generator_path, n_iterations, seed, image_size, use_view_lock_for_optim
         torch.manual_seed(seed)
         torch.manual_seed(0)
 
-    lock_view_dependence = True
+    lock_view_dependence = False
 
     img_yaws = [(math.pi / 4) * 3, -math.pi/2]
     img_pitches = [math.radians(30), math.radians(10)]
