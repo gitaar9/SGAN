@@ -1,5 +1,7 @@
+import glob
 import os
 
+import numpy as np
 import torch
 from PIL import Image
 from skimage import metrics
@@ -45,7 +47,7 @@ def calculate_ssim_for_folder(generated_folder, gt_folder, amount_of_images = 4,
     return ssims
 
 
-def main():
+def old_main():
     last_epoch = 675
     amount_of_images = 4
     img_size = 128
@@ -63,6 +65,34 @@ def main():
 
         # print(f"Sims for {car_id}: {ssims}|| Mean: {sum(ssims[1:]) / len(ssims[1:])}")
         print("Sims for {}: {}|| Mean: {:.3f}".format(car_id, ssims, sum(ssims[1:]) / len(ssims[1:])))
+
+
+def main():
+    output_folder = '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output/car_view_synthesis_test_set_output'
+    reference_folder = '/samsung_hdd/Files/AI/TNO/shapenet_renderer/car_view_synthesis_test_set'
+    img_size = 128
+
+    object_folders = glob.glob(os.path.join(output_folder, '*'))
+
+    generated_images_paths = [os.path.join(p, 'rgb', '0.png') for p in object_folders]
+    generated_images = load_image_from_paths(generated_images_paths, img_size)
+
+    objects_ids = [p.split('/')[-1] for p in object_folders]
+    ground_truth_image_paths = [os.path.join(reference_folder, o_id, 'rgb', '000001.png') for o_id in objects_ids]
+    ground_truth_images = load_image_from_paths(ground_truth_image_paths, img_size)
+
+    ssims = []
+    for generated_image, gt_image in zip(generated_images, ground_truth_images):
+        ssim = metrics.structural_similarity(
+            generated_image,
+            gt_image,
+            multichannel=True,
+            data_range=2,
+        )
+        ssims.append(ssim)
+
+    ssims = np.asarray(ssims)
+    print(f"Average SSIM over {len(generated_images)} images: {np.mean(ssims):.3f}:{np.std(ssims):.3f}")
 
 
 if __name__ == '__main__':
