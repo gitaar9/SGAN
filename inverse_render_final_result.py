@@ -20,7 +20,7 @@ def tensor_to_PIL(img):
     return Image.fromarray(img.mul(255).add_(0.5).clamp_(0, 255).permute(1, 2, 0).to('cpu', torch.uint8).numpy())
 
 
-def get_ground_truth_images(image_folder, n_input_views, image_size):
+def get_ground_truth_images(image_folder, n_input_views, image_size, device):
     img_names = ['000000.png', '000001.png', '000002.png', '000003.png'][:n_input_views]
     img_paths = [os.path.join(image_folder, "rgb", name) for name in img_names]
 
@@ -38,7 +38,7 @@ def get_ground_truth_images(image_folder, n_input_views, image_size):
     return torch.cat(gt_images, dim=0)
 
 
-def get_average_frequencies(generator):
+def get_average_frequencies(generator, device):
     z = torch.randn((10000, 256), device=device)
     with torch.no_grad():
         frequencies, phase_shifts = generator.siren.mapping_network(z)
@@ -96,12 +96,26 @@ def create_mp4(frames, output_dir):
     writer.close()
 
 
+def generate_image_for_given_z(generator, frequencies, phase_shifts, h_mean, v_mean, max_batch_size,
+                               lock_view_dependence, render_options):
+    with torch.no_grad():
+        with torch.cuda.amp.autocast():
+            img, _ = generator.staged_forward_with_frequencies(frequencies,
+                                                               phase_shifts,
+                                                               h_mean=h_mean,
+                                                               v_mean=v_mean,
+                                                               max_batch_size=max_batch_size,
+                                                               lock_view_dependence=lock_view_dependence,
+                                                               **render_options)
+    return img
+
+
 def find_latent_z(
         generator, n_iterations, gt_images, gt_h_means, gt_v_means, output_dir, options, render_options, max_batch_size,
-        output_image_h_means, output_image_v_means, lock_view_dependence=True, use_view_lock_for_optimization=True,
-        generate_output=True):
+        output_image_h_means, output_image_v_means, device, lock_view_dependence=True,
+        use_view_lock_for_optimization=True, generate_output=True):
     n_input_views = len(gt_images)
-    w_frequencies, w_phase_shifts = get_average_frequencies(generator)
+    w_frequencies, w_phase_shifts = get_average_frequencies(generator, device)
 
     w_frequency_offsets = torch.zeros_like(w_frequencies)
     w_phase_shift_offsets = torch.zeros_like(w_phase_shifts)
@@ -138,8 +152,8 @@ def find_latent_z(
         # loss = torch.nn.L1Loss()(all_frames, gt_images)
         loss = torch.nn.MSELoss()(all_frames, gt_images)
         loss = loss.mean()
-
-        print(f"{i + 1}/{n_iterations}: {loss.item()} {scheduler.get_lr()}")
+        if generate_output:
+            print(f"{i + 1}/{n_iterations}: {loss.item()} {scheduler.get_lr()}")
 
         loss.backward()
         optimizer.step()
@@ -149,38 +163,40 @@ def find_latent_z(
             if i % 25 == 0:
                 save_image(all_frames[0], f"{output_dir}/{i}.jpg", normalize=True)
 
-        del frame
-        del all_frames
+            del frame
+            del all_frames
 
-        if generate_output:
             # Every 25 rounds make images of all possible gt_poses
             if i % 25 == 0:
-                with torch.no_grad():
-                    with torch.cuda.amp.autocast():
-                        for idx, (h, v) in enumerate(zip(output_image_h_means, output_image_v_means)):
-                            img, _ = generator.staged_forward_with_frequencies(w_frequencies + w_frequency_offsets,
-                                                                               w_phase_shifts + w_phase_shift_offsets,
-                                                                               h_mean=h,
-                                                                               v_mean=v,
-                                                                               max_batch_size=max_batch_size,
-                                                                               lock_view_dependence=lock_view_dependence,
-                                                                               **render_options)
-                            save_image(img, f"{output_dir}/{i}_{idx}.jpg", normalize=True)
+                for idx, (h, v) in enumerate(zip(output_image_h_means, output_image_v_means)):
+                    img = generate_image_for_given_z(
+                        generator=generator,
+                        frequencies=w_frequencies + w_frequency_offsets,
+                        phase_shifts=w_phase_shifts + w_phase_shift_offsets,
+                        h_mean=h,
+                        v_mean=v,
+                        max_batch_size=max_batch_size,
+                        lock_view_dependence=lock_view_dependence,
+                        render_options=render_options
+                    )
+                    save_image(img, f"{output_dir}/{i}_{idx}.jpg", normalize=True)
+
 
             # Every round add the first gt pose to the frames
-            with torch.no_grad():
-                with torch.cuda.amp.autocast():
-                    img, _ = generator.staged_forward_with_frequencies(w_frequencies + w_frequency_offsets,
-                                                                       w_phase_shifts + w_phase_shift_offsets,
-                                                                       h_mean=gt_h_means[0],
-                                                                       v_mean= gt_v_means[0],
-                                                                       max_batch_size=max_batch_size,
-                                                                       lock_view_dependence=lock_view_dependence,
-                                                                       **render_options)
-                    frames.append(tensor_to_PIL(img))
+            img = generate_image_for_given_z(
+                generator=generator,
+                frequencies=w_frequencies + w_frequency_offsets,
+                phase_shifts=w_phase_shifts + w_phase_shift_offsets,
+                h_mean=gt_h_means[0],
+                v_mean=gt_v_means[0],
+                max_batch_size=max_batch_size,
+                lock_view_dependence=lock_view_dependence,
+                render_options=render_options
+            )
+            frames.append(tensor_to_PIL(img))
 
         scheduler.step()
-    return frames, w_frequencies + w_frequency_offsets, w_phase_shifts + w_phase_shift_offsets
+    return frames if generate_output else [frame], w_frequencies + w_frequency_offsets, w_phase_shifts + w_phase_shift_offsets
 
 
 def main(opt, device):
@@ -195,7 +211,7 @@ def main(opt, device):
     lock_view_dependence = True
 
     # Load one or multiple images
-    gt_images = get_ground_truth_images(opt.image_path, opt.n_input_views, opt.image_size)
+    gt_images = get_ground_truth_images(opt.image_path, opt.n_input_views, opt.image_size, device)
 
     # Inference poses:
     img_yaws = [math.pi / 2, math.pi, -math.pi/2, -math.pi/2]
@@ -251,6 +267,7 @@ def main(opt, device):
         max_batch_size=opt.max_batch_size,
         output_image_h_means=image_h_means,
         output_image_v_means=image_v_means,
+        device=device,
         lock_view_dependence=lock_view_dependence,
         use_view_lock_for_optimization=opt.use_view_lock_for_optimization,
         generate_output=True
