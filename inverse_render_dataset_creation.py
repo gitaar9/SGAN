@@ -10,8 +10,8 @@ from torchvision.utils import save_image
 from inverse_render_final_result import find_latent_z, get_ground_truth_images, generate_image_for_given_z
 
 
-def main(generator_path, seed, image_size, use_view_lock_for_optimization, change_yaw, dataset_path, output_dir,
-         max_batch_size, device):
+def main(generator_path, n_iterations, seed, image_size, use_view_lock_for_optimization, change_yaw, dataset_path,
+         output_dir, max_batch_size, device):
     generator = torch.load(generator_path, map_location=torch.device(device))
     generator.set_device(device)
     generator.eval()
@@ -70,13 +70,20 @@ def main(generator_path, seed, image_size, use_view_lock_for_optimization, chang
 
     for idx, object_folder in enumerate(object_folders):
         object_id = object_folder.split('/')[-1]
+        output_folder_path = os.path.join(output_dir, object_id, 'rgb')
+        output_file_path = os.path.join(output_folder_path, "0.png")
+        gt_output_file_path = os.path.join(output_folder_path, "gt.png")
         print(f"{idx + 1}/{len(object_folders)}: Finding z for {object_id}")
+        if os.path.isfile(output_file_path) and os.path.isfile(gt_output_file_path):
+            print("Skipping since output files already exist.")
+            continue
+
         # Load one or multiple images
         gt_images = get_ground_truth_images(object_folder, 1, image_size, device)
 
         frames, found_frequencies, found_phase_shifts = find_latent_z(
             generator=generator,
-            n_iterations=100,
+            n_iterations=n_iterations,
             gt_images=gt_images,
             gt_h_means=gt_h_means,
             gt_v_means=gt_v_means,
@@ -91,7 +98,7 @@ def main(generator_path, seed, image_size, use_view_lock_for_optimization, chang
             use_view_lock_for_optimization=use_view_lock_for_optimization,
             generate_output=False
         )
-        Path(f"{output_dir}/{object_id}/rgb/").mkdir(parents=True, exist_ok=True)
+        Path(output_folder_path).mkdir(parents=True, exist_ok=True)
 
         # Output img for classification
         img = generate_image_for_given_z(
@@ -104,8 +111,9 @@ def main(generator_path, seed, image_size, use_view_lock_for_optimization, chang
             lock_view_dependence=lock_view_dependence,
             render_options=render_options
         )
-        save_image(img, f"{output_dir}/{object_id}/rgb/0.png", normalize=True)
-        # Output reference
+        save_image(img, output_file_path, normalize=True)
+        # Output reference gt image
+        save_image(frames[0], gt_output_file_path, normalize=True)
 
 
 if __name__ == '__main__':
@@ -117,6 +125,7 @@ if __name__ == '__main__':
     parser.add_argument('--output_dir', type=str)
     parser.add_argument('--seed', type=int, default=None)
     parser.add_argument('--image_size', type=int, default=128)
+    parser.add_argument('--n_iterations', type=int, default=700)
     parser.add_argument('--max_batch_size', type=int, default=2400000)
     parser.add_argument('--use_view_lock_for_optimization', action='store_true')
     parser.add_argument('--change_yaw', action='store_true')
@@ -126,6 +135,7 @@ if __name__ == '__main__':
 
     main(
         generator_path=input_args.generator_path,
+        n_iterations=input_args.n_iterations,
         seed=input_args.seed,
         image_size=input_args.image_size,
         use_view_lock_for_optimization=input_args.use_view_lock_for_optimization,
@@ -136,5 +146,4 @@ if __name__ == '__main__':
         device=device
     )
 
-
-# python inverse_render.py ../models/shapenetships_sym_loss_hierarchical_72900/ /home/gitaar9/AI/TNO/shapenet_renderer/ship_renders_train_upper_hemisphere_30_fov/1a2b1863733c2ca65e26ee427f1e5a4c/rgb/000015.png --num_frames=30 --max_batch_size=100000
+# python inverse_render_dataset_creation.py decent_sncar_generator.pth ../../shapenet_renderer/car_view_synthesis_validation_set/ --output_dir test_dataset_generation/ --image_size 64 --max_batch_size=100000 --use_view_lock_for_optimization

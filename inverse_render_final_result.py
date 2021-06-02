@@ -3,16 +3,13 @@ import math
 import os
 from pathlib import Path
 
-from torchvision.utils import save_image
-
-import torch
-import numpy as np
-from PIL import Image
-from tqdm import tqdm
 import numpy as np
 import skvideo.io
-import curriculums
+import torch
+from PIL import Image
 from torchvision import transforms
+from torchvision.utils import save_image
+from tqdm import tqdm
 
 
 def tensor_to_PIL(img):
