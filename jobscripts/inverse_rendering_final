@@ -11,11 +11,15 @@ ml Python/3.7.4-GCCcore-8.3.0
 
 source /data/s2576597/SGAN/venv/bin/activate
 
-CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetships_sym_loss_hierarchical_v2/generator.pth inverse_images/ships/container/ --num_frames=128 --image_size=128 --output_dir=inverse_images/ships_inference/container/ --use_view_lock_for_optimization
-CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetships_sym_loss_hierarchical_v2/generator.pth inverse_images/ships/yamato/ --num_frames=128 --image_size=128 --output_dir=inverse_images/ships_inference/yamato/ --use_view_lock_for_optimization
+CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetships_sym_loss_hierarchical_v2/generator.pth inverse_images/ships/1fb07d5bf3421a46e2b83b21c9537e1b/ --num_frames=128 --image_size=128 --output_dir=inverse_images/ships_inference/1fb07d5bf3421a46e2b83b21c9537e1b/ --use_view_lock_for_optimization
+CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetships_sym_loss_hierarchical_v2/generator.pth inverse_images/ships/3d908c2b4f5812702fc668af6d3ad0ad/ --num_frames=128 --image_size=128 --output_dir=inverse_images/ships_inference/3d908c2b4f5812702fc668af6d3ad0ad/ --use_view_lock_for_optimization
+CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetships_sym_loss_hierarchical_v2/generator.pth inverse_images/ships/50c0bd9933f7259fe59358c5e6239c84/ --num_frames=128 --image_size=128 --output_dir=inverse_images/ships_inference/50c0bd9933f7259fe59358c5e6239c84/ --use_view_lock_for_optimization
 
-CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetships_no_mirror_v2/30--06:22--_99000--generator.pth inverse_images/ships/container/ --num_frames=128 --image_size=128 --output_dir=inverse_images/ships_inference/no_mirror/container/ --use_view_lock_for_optimization
-CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetships_no_mirror_v2/30--06:22--_99000--generator.pth inverse_images/ships/yamato/ --num_frames=128 --image_size=128 --output_dir=inverse_images/ships_inference/no_mirror/yamato/ --use_view_lock_for_optimization
+#CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetships_sym_loss_hierarchical_v2/generator.pth inverse_images/ships/container/ --num_frames=128 --image_size=128 --output_dir=inverse_images/ships_inference/container/ --use_view_lock_for_optimization
+#CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetships_sym_loss_hierarchical_v2/generator.pth inverse_images/ships/yamato/ --num_frames=128 --image_size=128 --output_dir=inverse_images/ships_inference/yamato/ --use_view_lock_for_optimization
+#
+#CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetships_no_mirror_v2/30--06:22--_99000--generator.pth inverse_images/ships/container/ --num_frames=128 --image_size=128 --output_dir=inverse_images/ships_inference/no_mirror/container/ --use_view_lock_for_optimization
+#CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetships_no_mirror_v2/30--06:22--_99000--generator.pth inverse_images/ships/yamato/ --num_frames=128 --image_size=128 --output_dir=inverse_images/ships_inference/no_mirror/yamato/ --use_view_lock_for_optimization
 
 
 #CUDA_VISIBLE_DEVICES=0 python -u inverse_render_final_result.py /data/s2576597/SGAN/shapenetcars_sym_loss_hierarchical/17--20:36--generator.pth inverse_images/cars/real_images/minicooper/ --num_frames=128 --image_size=128 --output_dir=inverse_images/l2/real/cars_inference/minicooper/ --use_view_lock_for_optimization
