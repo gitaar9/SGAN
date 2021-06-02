@@ -1,5 +1,6 @@
 import glob
 import os
+from functools import cmp_to_key
 
 import cv2
 import numpy as np
@@ -9,7 +10,7 @@ from skimage import metrics
 from torchvision import transforms
 
 
-def show_gt_generated_image_samples(generated_image_paths, gt_image_paths, image_size=128):
+def create_gt_generated_image_samples(generated_image_paths, gt_image_paths, image_size=128):
     gen_images = []
     gt_images = []
     for gen_img_p, gt_img_p in zip(generated_image_paths, gt_image_paths):
@@ -19,12 +20,7 @@ def show_gt_generated_image_samples(generated_image_paths, gt_image_paths, image
         gt_image = cv2.resize(gt_image, (image_size, image_size), interpolation=cv2.INTER_CUBIC)
         gt_images.append(gt_image)
     image = np.vstack([np.hstack(gen_images), np.hstack(gt_images)])
-    # You may need to convert the color.
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    im_pil = Image.fromarray(image)
-    im_pil.show()
-    # cv2.imshow('image', image.astype(np.uint8))  # Show the image
-    # cv2.waitKey(0)
+    return image
 
 
 def load_image_from_paths(img_paths, img_size=128):
@@ -86,18 +82,66 @@ def old_main():
         print("Sims for {}: {}|| Mean: {:.3f}".format(car_id, ssims, sum(ssims[1:]) / len(ssims[1:])))
 
 
+def cmp_paths(a, b):
+    l = [
+        '1b1a7af332f8f154487edd538b3d83f6',
+        '4ac021653126a29e98618a1ba17f086b',
+        '59e01fab310fa8c49c9f1f5abaab90a7',
+        'a3e7603c0d9ef56280e74058ee862f05',
+        '39d161909e94d99e61b9ff60b1be412',
+        '3d358a98f90e8b4d5b1edf5d4f643136',
+        '5c5908b7a19d8df7402ac33e676077b1',
+        '3ae62dd54a2dd59ad7d2e5d7d40456b9',
+        '999007a25b5f3db3d92073757fe1175e',
+        '70b8730b003c345159139efcde1fedcb',
+        '99f49d11dad8ee25e517b5f5894c76d9',
+        '93bb1cd910f054818c2e7159929c406f',
+        'ee0edec0ac0578082ea8e4c752a397ac',
+        '625861912ac0d62651a95aaa6caba1d3',
+        '99fce87e4e80e053374462542bf2aa29',
+        'afa0436d9cb1b19ec8c241cb24f7e0ac',
+        'dcfdb673231b64ea413908c0e169330',
+        'af08f280395cd31719f6a4bcc93433',
+        '77a759df0166630adeb0f0d7312576e9',
+        '1cc85c2c1580088aad48f475ce080a1f',
+        'f6a93b95e10a8b2d6aea15d30373dbc0',
+        '2c3a3033d248d05851a95aaa6caba1d3',
+        'd0bf09ffa93ba912582e5e3e7771ea25',
+        'bf52cda8de7e5eff36dfef0450f0ee37',
+        '8b7b6c2a5c664ca6efe5f291bc2f5fd0'
+    ]
+    a = a.split('/')[-1]
+    b = b.split('/')[-1]
+    if a in l:
+        a = l.index(a)
+    else:
+        a = 30
+    if b in l:
+        b = l.index(b)
+    else:
+        b = 30
+    if a > b:
+        return 1
+    elif a == b:
+        return 0
+    else:
+        return -1
+
 def main():
 
     output_folders = [
         '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output/car_view_synthesis_test_set_output',
         '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_350/car_view_synthesis_test_set_output_350',
-        '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock/car_view_synthesis_test_set_output_no_view_lock'
+        '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock/car_view_synthesis_test_set_output_no_view_lock',
+        '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock_at_all/car_view_synthesis_test_set_output_no_view_lock_at_all'
     ]
     reference_folder = '/samsung_hdd/Files/AI/TNO/shapenet_renderer/car_view_synthesis_test_set'
     img_size = 128
 
+    samples = []
     for output_folder in output_folders:
         object_folders = glob.glob(os.path.join(output_folder, '*'))
+        object_folders.sort(key=cmp_to_key(cmp_paths))
 
         generated_images_paths = [os.path.join(p, 'rgb', '0.png') for p in object_folders]
         generated_images = load_image_from_paths(generated_images_paths, img_size)
@@ -117,10 +161,20 @@ def main():
             ssims.append(ssim)
 
         ssims = np.asarray(ssims)
-        print(ssims)
+        # print(ssims)
         print(f"Average SSIM over {len(generated_images)} images: {np.mean(ssims):.3f}:{np.std(ssims):.3f}")
 
-        # show_gt_generated_image_samples(generated_images_paths, ground_truth_image_paths[:len(generated_images_paths)])
+        samples.append(create_gt_generated_image_samples(generated_images_paths, ground_truth_image_paths[:len(generated_images_paths)]))
+        #
+
+    # You may need to convert the color.
+    min_width = min([s.shape[1] for s in samples])
+    image = np.vstack([s[:, :min_width] for s in samples])
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    im_pil = Image.fromarray(image)
+    im_pil.show()
+    # cv2.imshow('image', image.astype(np.uint8))  # Show the image
+    # cv2.waitKey(0)
 
 
 if __name__ == '__main__':
