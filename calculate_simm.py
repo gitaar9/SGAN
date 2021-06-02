@@ -1,11 +1,26 @@
 import glob
 import os
 
+import cv2
 import numpy as np
 import torch
 from PIL import Image
 from skimage import metrics
 from torchvision import transforms
+
+
+def show_gt_generated_image_samples(generated_image_paths, gt_image_paths, image_size=128):
+    gen_images = []
+    gt_images = []
+    for gen_img_p, gt_img_p in zip(generated_image_paths, gt_image_paths):
+        gen_image = cv2.imread(gen_img_p)  # Load the image
+        gen_images.append(gen_image)
+        gt_image = cv2.imread(gt_img_p)  # Load the image
+        gt_image = cv2.resize(gt_image, (image_size, image_size), interpolation=cv2.INTER_CUBIC)
+        gt_images.append(gt_image)
+    image = np.vstack([np.hstack(gen_images), np.hstack(gt_images)])
+    cv2.imshow('image', image.astype(np.uint8))  # Show the image
+    cv2.waitKey(0)
 
 
 def load_image_from_paths(img_paths, img_size=128):
@@ -69,6 +84,7 @@ def old_main():
 
 def main():
     output_folder = '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output/car_view_synthesis_test_set_output'
+    output_folder = '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_350/car_view_synthesis_test_set_output_350'
     reference_folder = '/samsung_hdd/Files/AI/TNO/shapenet_renderer/car_view_synthesis_test_set'
     img_size = 128
 
@@ -92,7 +108,10 @@ def main():
         ssims.append(ssim)
 
     ssims = np.asarray(ssims)
+    print(ssims)
     print(f"Average SSIM over {len(generated_images)} images: {np.mean(ssims):.3f}:{np.std(ssims):.3f}")
+
+    show_gt_generated_image_samples(generated_images_paths, ground_truth_image_paths[:len(generated_images_paths)])
 
 
 if __name__ == '__main__':
