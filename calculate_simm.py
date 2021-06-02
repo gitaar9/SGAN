@@ -133,7 +133,8 @@ def main():
         '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output/car_view_synthesis_test_set_output',
         '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_350/car_view_synthesis_test_set_output_350',
         '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock/car_view_synthesis_test_set_output_no_view_lock',
-        '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock_at_all/car_view_synthesis_test_set_output_no_view_lock_at_all'
+        '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock_at_all/car_view_synthesis_test_set_output_no_view_lock_at_all',
+        '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock_at_all_700/car_view_synthesis_test_set_output_no_view_lock_at_all_700'
     ]
     reference_folder = '/samsung_hdd/Files/AI/TNO/shapenet_renderer/car_view_synthesis_test_set'
     img_size = 128
