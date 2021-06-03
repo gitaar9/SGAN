@@ -163,7 +163,7 @@ def main():
 
         ssims = np.asarray(ssims)
         # print(ssims)
-        print(f"Average SSIM over {len(generated_images)} images: {np.mean(ssims):.3f}:{np.std(ssims):.3f}")
+        print(f"Average SSIM over {len(generated_images)} images: {np.mean(ssims):.3f}:{np.std(ssims):.3f}\t(median: {np.median(ssims):.3f})")
 
         samples.append(create_gt_generated_image_samples(generated_images_paths, ground_truth_image_paths[:len(generated_images_paths)]))
         #
