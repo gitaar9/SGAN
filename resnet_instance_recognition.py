@@ -1,4 +1,6 @@
 import copy
+import glob
+import os
 import time
 
 import torch
@@ -105,7 +107,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     if model_name == "resnet":
         """ Resnet18
         """
-        model_ft = models.resnet18(pretrained=use_pretrained)
+        model_ft = models.resnet34(pretrained=use_pretrained)
         set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.fc.in_features
         model_ft.fc = nn.Linear(num_ftrs, num_classes)
@@ -210,7 +212,8 @@ def main():
     # Models to choose from [resnet, alexnet, vgg, squeezenet, densenet, inception]
     model_name = "resnet"
     # Number of classes in the dataset
-    num_classes = 351
+    num_classes = len(glob.glob(os.path.join(data_dir, '*')))
+    print(f"Found {num_classes} different classes")
     # Batch size for training (change depending on how much memory you have)
     batch_size = 8
     # Number of epochs to train for
@@ -221,6 +224,7 @@ def main():
 
     # Detect if we have a GPU available
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print(f"Using {device}")
 
     # Initialize the model for this run
     model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=True)

@@ -10,16 +10,20 @@ from skimage import metrics
 from torchvision import transforms
 
 
+def glue_images_from_path(paths, image_size=128):
+    images = []
+    for p in paths:
+        image = cv2.imread(p)  # Load the image
+        image = cv2.resize(image, (image_size, image_size), interpolation=cv2.INTER_CUBIC)
+        images.append(image)
+    final_image = np.hstack(images)
+    return final_image
+
+
 def create_gt_generated_image_samples(generated_image_paths, gt_image_paths, image_size=128):
-    gen_images = []
-    gt_images = []
-    for gen_img_p, gt_img_p in zip(generated_image_paths, gt_image_paths):
-        gen_image = cv2.imread(gen_img_p)  # Load the image
-        gen_images.append(gen_image)
-        gt_image = cv2.imread(gt_img_p)  # Load the image
-        gt_image = cv2.resize(gt_image, (image_size, image_size), interpolation=cv2.INTER_CUBIC)
-        gt_images.append(gt_image)
-    image = np.vstack([np.hstack(gen_images), np.hstack(gt_images)])
+    image = np.vstack(
+        [glue_images_from_path(generated_image_paths, image_size), glue_images_from_path(gt_image_paths, image_size)]
+    )
     return image
 
 
@@ -165,8 +169,12 @@ def main():
         # print(ssims)
         print(f"Average SSIM over {len(generated_images)} images: {np.mean(ssims):.3f}:{np.std(ssims):.3f}\t(median: {np.median(ssims):.3f})")
 
-        samples.append(create_gt_generated_image_samples(generated_images_paths, ground_truth_image_paths[:len(generated_images_paths)]))
+        samples.append(glue_images_from_path(generated_images_paths))
         #
+
+    samples.append(glue_images_from_path(ground_truth_image_paths))
+    input_image_paths = [os.path.join('/samsung_hdd/Files/AI/TNO/shapenet_renderer/car_view_synthesis_test_set', o_id, 'rgb', '000000.png') for o_id in objects_ids]
+    samples.append(glue_images_from_path(input_image_paths))
 
     # You may need to convert the color.
     min_width = min([s.shape[1] for s in samples])
@@ -176,7 +184,7 @@ def main():
     im_pil.show()
     # cv2.imshow('image', image.astype(np.uint8))  # Show the image
     # cv2.waitKey(0)
-
+    print(objects_ids)
 
 if __name__ == '__main__':
     main()
