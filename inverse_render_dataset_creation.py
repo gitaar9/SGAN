@@ -20,8 +20,6 @@ def main(generator_path, n_iterations, seed, image_size, use_view_lock_for_optim
         torch.manual_seed(seed)
         torch.manual_seed(0)
 
-    lock_view_dependence = False
-
     img_yaws = [(math.pi / 4) * 3, -math.pi/2]
     img_pitches = [math.radians(30), math.radians(10)]
 
@@ -94,7 +92,7 @@ def main(generator_path, n_iterations, seed, image_size, use_view_lock_for_optim
             output_image_h_means=[],
             output_image_v_means=[],
             device=device,
-            lock_view_dependence=lock_view_dependence,
+            lock_view_dependence=True,
             use_view_lock_for_optimization=use_view_lock_for_optimization,
             generate_output=False
         )
@@ -108,7 +106,7 @@ def main(generator_path, n_iterations, seed, image_size, use_view_lock_for_optim
             h_mean=output_h_mean,
             v_mean=output_v_mean,
             max_batch_size=max_batch_size,
-            lock_view_dependence=lock_view_dependence,
+            lock_view_dependence=True,
             render_options=render_options
         )
         save_image(img, output_file_path, normalize=True)
