@@ -11,6 +11,13 @@ ml Python/3.7.4-GCCcore-8.3.0
 
 source /data/s2576597/SGAN/venv/bin/activate
 
-CUDA_VISIBLE_DEVICES=0 python -u eval_metrics.py /scratch/s2576597/old_SGAN/shapenetcars_sym_loss_hierarchical/17--20:36--generator.pth --real_image_dir=/scratch/s2576597/fid_evaluation/real_shapenetcar/ --output_dir=/scratch/s2576597/fid_evaluation/generated_shapenetcar_sym_loss/ --max_batch_size=3000000
-CUDA_VISIBLE_DEVICES=0 python -u eval_metrics.py /scratch/s2576597/old_SGAN/shapenetcars_no_mirror/21--22:03--generator.pth --real_image_dir=/scratch/s2576597/fid_evaluation/real_shapenetcar/ --output_dir=/scratch/s2576597/fid_evaluation/generated_shapenetcar_no_mirror/ --max_batch_size=3000000
+
+CUDA_VISIBLE_DEVICES=0 python -u eval_metrics.py /scratch/s2576597/old_SGAN/shapenetcars_no_mirror/generator.pth --real_image_dir=/scratch/s2576597/fid_evaluation/real_shapenetcar/ --output_dir=/scratch/s2576597/fid_evaluation/generated_shapenetcar_no_mirror/ --max_batch_size=3000000
+
+#CUDA_VISIBLE_DEVICES=0 python -u eval_metrics.py /scratch/s2576597/old_SGAN/shapenetcars_sym_loss_hierarchical/17--20:36--generator.pth --real_image_dir=/scratch/s2576597/fid_evaluation/real_shapenetcar/ --output_dir=/scratch/s2576597/fid_evaluation/generated_shapenetcar_sym_loss/ --max_batch_size=3000000
+#CUDA_VISIBLE_DEVICES=0 python -u eval_metrics.py /scratch/s2576597/old_SGAN/shapenetcars_no_mirror/21--22:03--generator.pth --real_image_dir=/scratch/s2576597/fid_evaluation/real_shapenetcar/ --output_dir=/scratch/s2576597/fid_evaluation/generated_shapenetcar_no_mirror/ --max_batch_size=3000000
+
+
+
+
 #CUDA_VISIBLE_DEVICES=0 python -u fid_evaluation.py /scratch/s2576597/old_SGAN/shapenetcars_sym_loss_hierarchical/17--20:36--generator.pth /scratch/s2576597/fid_evaluation/first_test/ SHAPENETCARS_SYM_LOSS_HIERARCHICAL_V3 --gpu_type=aslongasitcontains6 --ema
