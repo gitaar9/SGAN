@@ -32,12 +32,12 @@ curriculum = {
 }
 
 curriculum.update({
-    'batch_size': 1,
-    'num_steps': 64,
+    'batch_size': 2,
+    'num_steps': 30,
     'img_size': 128,
     'batch_split': 1,
     'nerf_noise': 0,
-    'hierarchical_sample': False,
+    'hierarchical_sample': True,
 })
 
 
