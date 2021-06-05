@@ -28,16 +28,16 @@ curriculum = {
     'white_back': True,
     'clamp_mode': 'relu',
     'z_dist': 'gaussian',
-    'hierarchical_sample': True,
     'psi': .7,
 }
 
 curriculum.update({
-    'batch_size': 2,
-    'num_steps': 30,
+    'batch_size': 1,
+    'num_steps': 64,
     'img_size': 128,
     'batch_split': 1,
     'nerf_noise': 0,
+    'hierarchical_sample': False,
 })
 
 
