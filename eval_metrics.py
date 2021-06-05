@@ -15,10 +15,6 @@ import shutil
 
 
 curriculum = {
-    'batch_size': 2,
-    'num_steps': 30,
-    'img_size': 128,
-    'batch_split': 1,
     'fov': 30,
     'ray_start': 0.75,
     'ray_end': 1.25,
@@ -39,7 +35,6 @@ curriculum = {
     'model': 'TALLSIREN',
     'generator': 'MirrorGenerator',
     'discriminator': 'ProgressiveEncoderDiscriminator',
-    'dataset': 'ShapenetCars',
     'white_back': True,
     'clamp_mode': 'relu',
     'z_dist': 'gaussian',
@@ -48,9 +43,15 @@ curriculum = {
     'pos_lambda': 0,
     'sym_lambda': 33,
     'learnable_dist': False,
-    'nerf_noise': 0,
 }
 
+curriculum.update({
+    'batch_size': 2,
+    'num_steps': 30,
+    'img_size': 128,
+    'batch_split': 1,
+    'nerf_noise': 0,
+})
 
 def output_real_images(dataloader, num_imgs, real_dir):
     img_counter = 0
@@ -87,13 +88,14 @@ if __name__ == '__main__':
     parser.add_argument('--num_images', type=int, default=2048)
     parser.add_argument('--gpu_type', type=str, default='8000')
     parser.add_argument('--max_batch_size', type=int, default=94800000)
+    parser.add_argument('--dataset_class', type=str, default='ShapenetCarsTest')
 
     opt = parser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # Make real images if they dont exist
-    real_images_dir = setup_evaluation('ShapenetCarsTest', opt.real_image_dir, target_size=curriculum['img_size'])
+    real_images_dir = setup_evaluation(opt.dataset_class, opt.real_image_dir, target_size=curriculum['img_size'])
 
     if os.path.exists(opt.output_dir) and os.path.isdir(opt.output_dir):
         shutil.rmtree(opt.output_dir)
@@ -115,4 +117,5 @@ if __name__ == '__main__':
             save_image(img, os.path.join(opt.output_dir, f'{img_counter:0>5}.jpg'), normalize=True, range=(-1, 1))
 
     metrics_dict = calculate_metrics(opt.output_dir, opt.real_image_dir, cuda=True, isc=True, fid=True, kid=True, verbose=False)
+    print(opt.generator_file)
     print(metrics_dict)
