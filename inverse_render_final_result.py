@@ -22,9 +22,12 @@ def get_ground_truth_images(image_folder, n_input_views, image_size, device):
     img_paths = [os.path.join(image_folder, "rgb", name) for name in img_names]
 
     transform = transforms.Compose(
-        [transforms.Resize(256), transforms.CenterCrop(256),
-         transforms.Resize((image_size, image_size), interpolation=0), transforms.ToTensor(),
-         transforms.Normalize([0.5], [0.5])])
+        [
+            transforms.ToTensor(),
+            transforms.Normalize([0.5], [0.5]),
+            transforms.Resize((image_size, image_size), interpolation=0)
+        ]
+    )
 
     gt_images = []
     for path in img_paths:
