@@ -67,7 +67,8 @@ def output_real_images(dataloader, num_imgs, real_dir):
 def setup_evaluation(dataset_name, real_image_dir, target_size=128, num_images=2048):
     # Only make real images if they haven't been made yet
 
-    generate_new_real_images = not os.path.exists(real_image_dir) or len(glob.glob(os.path.join(real_image_dir, '*.jpg')) < num_images)
+    generate_new_real_images = not os.path.exists(real_image_dir) or \
+                               len(glob.glob(os.path.join(real_image_dir, '*.jpg'))) < num_images
 
     if generate_new_real_images:
         os.makedirs(real_image_dir)
