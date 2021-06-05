@@ -83,7 +83,7 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # Make real images if they dont exist
-    real_images_dir = setup_evaluation(opt.dataset_class, opt.real_image_dir, target_size=curriculum['img_size'])
+    setup_evaluation(opt.dataset_class, opt.real_image_dir, target_size=curriculum['img_size'])
 
     if os.path.exists(opt.output_dir) and os.path.isdir(opt.output_dir):
         shutil.rmtree(opt.output_dir)
