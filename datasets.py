@@ -64,6 +64,15 @@ class ShapenetCars(CelebA):
         return X, 0
 
 
+class ShapenetCarsTest(ShapenetCars):
+    def __init__(self, img_size, **kwargs):
+        super().__init__(img_size)
+
+        self.data = glob.glob('/scratch/s2576597/pixel_nerf_datasets/car_renders_train_upper_hemisphere_30_fov_pixel_nerf/cars_test/*/rgb/*.png')
+        self.transform = transforms.Compose(
+                    [transforms.Resize(256), transforms.CenterCrop(256), transforms.ToTensor(), transforms.Normalize([0.5], [0.5]), transforms.RandomHorizontalFlip(p=0.5), transforms.Resize((img_size, img_size), interpolation=0)])
+
+
 class CARLA(CelebA):
     def __init__(self, img_size, **kwargs):
         super().__init__(img_size)
