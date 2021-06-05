@@ -36,6 +36,7 @@ def setup_evaluation(dataset_name, generated_dir, target_size=128):
     os.makedirs(generated_dir, exist_ok=True)
     return real_dir
 
+
 def output_images(generator, input_metadata, rank, world_size, output_dir, num_imgs=2048):
     metadata = copy.deepcopy(input_metadata)
     metadata['img_size'] = 128
@@ -62,12 +63,14 @@ def output_images(generator, input_metadata, rank, world_size, output_dir, num_i
                 if rank == 0: pbar.update(world_size)
     if rank == 0: pbar.close()
 
+
 def calculate_fid(dataset_name, generated_dir, target_size=256):
     real_dir = os.path.join('EvalImages', dataset_name + '_real_images_' + str(target_size))
     fid = fid_score.calculate_fid_given_paths([real_dir, generated_dir], 64, 'cuda', 2048)
     torch.cuda.empty_cache()
 
     return fid
+
 
 if __name__ == '__main__':
 

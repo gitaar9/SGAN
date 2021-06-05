@@ -136,7 +136,7 @@ def main():
     output_folders = [
         # '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output/car_view_synthesis_test_set_output',
         # '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_350/car_view_synthesis_test_set_output_350',
-        '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock/car_view_synthesis_test_set_output_no_view_lock',
+        # '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock/car_view_synthesis_test_set_output_no_view_lock',
         '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock_at_all/car_view_synthesis_test_set_output_no_view_lock_at_all',
         '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock_at_all_700/car_view_synthesis_test_set_output_no_view_lock_at_all_700',
         '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock_700/car_view_synthesis_test_set_output_no_view_lock_700',
@@ -168,7 +168,7 @@ def main():
 
         ssims = np.asarray(ssims)
         # print(ssims)
-        print(f"Average SSIM over {len(generated_images)} images: {np.mean(ssims):.3f}:{np.std(ssims):.3f}\t(median: {np.median(ssims):.3f})")
+        print(f"{output_folder.split('/')[-1]}: Average SSIM over {len(generated_images)} images: {np.mean(ssims):.3f}:{np.std(ssims):.3f}\t(median: {np.median(ssims):.3f})")
 
         samples.append(glue_images_from_path(generated_images_paths))
         #
@@ -186,6 +186,7 @@ def main():
     # cv2.imshow('image', image.astype(np.uint8))  # Show the image
     # cv2.waitKey(0)
     print(objects_ids)
+
 
 if __name__ == '__main__':
     main()

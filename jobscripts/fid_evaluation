@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#SBATCH --time=02:00:00
+#SBATCH --partition=gpushort
+#SBATCH --gres=gpu:v100:1
+#SBATCH --mem=8GB
+#SBATCH --job-name=inverse_render
+
+ml CUDA/10.2.89-GCC-8.3.0
+ml Python/3.7.4-GCCcore-8.3.0
+
+source /data/s2576597/SGAN/venv/bin/activate
+
+CUDA_VISIBLE_DEVICES=0 python -u fid_evaluation.py /scratch/s2576597/old_SGAN/shapenetcars_sym_loss_hierarchical/17--20:36--generator.pth /scratch/s2576597/fid_evaluation/first_test/ SHAPENETCARS_SYM_LOSS_HIERARCHICAL_V3 --gpu_type=aslongasitcontains6 --ema
