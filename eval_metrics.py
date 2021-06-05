@@ -48,6 +48,7 @@ curriculum = {
     'pos_lambda': 0,
     'sym_lambda': 33,
     'learnable_dist': False,
+    'nerf_noise': 0,
 }
 
 
