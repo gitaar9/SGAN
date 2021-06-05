@@ -98,6 +98,15 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     curriculum = getattr(curriculums, opt.curriculum)
 
+    # If we are over the epochs that we specified img size for just use these defaults:
+    if 'img_size' not in curriculum:
+        curriculum['batch_size'] = 2
+        curriculum['num_steps'] = 30
+        curriculum['img_size'] = 128
+        curriculum['batch_split'] = 1
+        curriculum['gen_lr'] = 3e-7
+        curriculum['disc_lr'] = 3e-6
+
     real_images_dir = setup_evaluation(curriculum['dataset'], opt.output_dir, target_size=curriculum['img_size'])
 
     os.makedirs(opt.output_dir, exist_ok=True)
