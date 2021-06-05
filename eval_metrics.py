@@ -24,25 +24,12 @@ curriculum = {
     'v_stddev': math.pi / 4 * 85 / 90,
     'h_mean': math.pi * 0.5,
     'v_mean': math.pi / 4 * 85 / 90,
-    'topk_interval': 1000,
-    'topk_v': 0.5,
-    'betas': (0, 0.9),
-    'unique_lr': True,
-    'weight_decay': 0,
-    'r1_lambda': 1,
     'latent_dim': 256,
-    'grad_clip': 1,
-    'model': 'TALLSIREN',
-    'generator': 'MirrorGenerator',
-    'discriminator': 'ProgressiveEncoderDiscriminator',
     'white_back': True,
     'clamp_mode': 'relu',
     'z_dist': 'gaussian',
     'hierarchical_sample': True,
-    'z_lambda': 0,
-    'pos_lambda': 0,
-    'sym_lambda': 33,
-    'learnable_dist': False,
+    'psi': .7,
 }
 
 curriculum.update({
@@ -52,6 +39,7 @@ curriculum.update({
     'batch_split': 1,
     'nerf_noise': 0,
 })
+
 
 def output_real_images(dataloader, num_imgs, real_dir):
     img_counter = 0
