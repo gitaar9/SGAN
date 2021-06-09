@@ -137,19 +137,24 @@ def main():
         # '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output/car_view_synthesis_test_set_output',
         # '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_350/car_view_synthesis_test_set_output_350',
         # '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock/car_view_synthesis_test_set_output_no_view_lock',
-        '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock_at_all/car_view_synthesis_test_set_output_no_view_lock_at_all',
+        # '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock_at_all/car_view_synthesis_test_set_output_no_view_lock_at_all',
         '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock_at_all_700/car_view_synthesis_test_set_output_no_view_lock_at_all_700',
-        '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock_700/car_view_synthesis_test_set_output_no_view_lock_700',
+        # '/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock_700/car_view_synthesis_test_set_output_no_view_lock_700',
+        '/samsung_hdd/Files/AI/TNO/pixel-nerf/code_testing/final_result_test',
     ]
-    reference_folder = '/samsung_hdd/Files/AI/TNO/shapenet_renderer/car_view_synthesis_test_set'
+    reference_folder = '/samsung_hdd/Files/AI/TNO/shapenet_renderer/car_view_synthesis_set_test'
     img_size = 128
 
     samples = []
     for output_folder in output_folders:
         object_folders = glob.glob(os.path.join(output_folder, '*'))
+        object_folders = [f for f in object_folders if '.' not in f]
         object_folders.sort(key=cmp_to_key(cmp_paths))
 
-        generated_images_paths = [os.path.join(p, 'rgb', '0.png') for p in object_folders]
+        if 'pixel-nerf' not in output_folder:
+            generated_images_paths = [os.path.join(p, 'rgb', '0.png') for p in object_folders]
+        else:
+            generated_images_paths = [os.path.join(p, '0.png') for p in object_folders]
         generated_images = load_image_from_paths(generated_images_paths, img_size)
 
         objects_ids = [p.split('/')[-1] for p in object_folders]
@@ -174,18 +179,18 @@ def main():
         #
 
     samples.append(glue_images_from_path(ground_truth_image_paths))
-    input_image_paths = [os.path.join('/samsung_hdd/Files/AI/TNO/shapenet_renderer/car_view_synthesis_test_set', o_id, 'rgb', '000000.png') for o_id in objects_ids]
+    input_image_paths = [os.path.join(reference_folder, o_id, 'rgb', '000000.png') for o_id in objects_ids]
     samples.append(glue_images_from_path(input_image_paths))
 
     # You may need to convert the color.
-    min_width = min([s.shape[1] for s in samples])
+    min_width = min(min([s.shape[1] for s in samples]), 5000)
     image = np.vstack([s[:, :min_width] for s in samples])
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     im_pil = Image.fromarray(image)
     im_pil.show()
     # cv2.imshow('image', image.astype(np.uint8))  # Show the image
     # cv2.waitKey(0)
-    print(objects_ids)
+    # print(objects_ids)
 
 
 if __name__ == '__main__':

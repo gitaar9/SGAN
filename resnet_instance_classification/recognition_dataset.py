@@ -1,5 +1,6 @@
 import glob
 import os
+import random
 
 import numpy as np
 import torch
@@ -23,10 +24,7 @@ class ShapeNetCarsRecognitionDataset(Dataset):
         self.train_data = self.load_data(amount_of_images_per_object)
 
     def load_data(self, amount_of_images_per_object):
-        # Read in annotations
-        object_folders = glob.glob(os.path.join(self.root_dir, '*'))
-        print(f"Found {len(object_folders)} objects")
-
+        object_folders = self.retrieve_object_folders()
         train_percentage = .8
         split_idx = int(amount_of_images_per_object * train_percentage)
 
@@ -37,12 +35,25 @@ class ShapeNetCarsRecognitionDataset(Dataset):
                 train_data.append((os.path.join(object_folder, f"rgb/{image_idx:06}.png"), class_label))
         return train_data
 
+    def retrieve_object_folders(self):
+        object_folders = glob.glob(os.path.join(self.root_dir, '*'))
+        object_folders = [f for f in object_folders if '.' not in f]
+        object_folders = list(sorted(object_folders))
+        print(f"Found {len(object_folders)} objects")
+        return object_folders
+
     def __len__(self):
         return len(self.train_data)
 
     def __getitem__(self, idx):
         image_path, class_label = self.train_data[idx]
         image = cv2.imread(image_path)
+
+        # if self.is_train:
+        #     ksize = random.randint(0, 20)
+        #     if ksize > 0:
+        #         ksize = (ksize, ksize)
+        #         image = cv2.blur(image, ksize)
 
         if image is None:
             print(f"Wrong path: {image_path}")
@@ -69,18 +80,27 @@ class ShapeNetCarsRecognitionDatasetOnlyLastImageIsTest(ShapeNetCarsRecognitionD
     """ShapeNetCars dataset for a recognition task"""
 
     def load_data(self, amount_of_images_per_object):
-        # Read in annotations
-        object_folders = glob.glob(os.path.join(self.root_dir, '*'))
-        print(f"Found {len(object_folders)} objects")
+        object_folders = self.retrieve_object_folders()
 
-        train_data = []
+        data = []
         for class_label, object_folder in enumerate(object_folders):
             if self.is_train:
                 for image_idx in range(amount_of_images_per_object - 1):
-                    train_data.append((os.path.join(object_folder, f"rgb/{image_idx:06}.png"), class_label))
+                    data.append((os.path.join(object_folder, f"rgb/{image_idx:06}.png"), class_label))
             else:
-                train_data.append((os.path.join(object_folder, f"rgb/{amount_of_images_per_object - 1:06}.png"), class_label))
-        return train_data
+                data.append((os.path.join(object_folder, f"rgb/{amount_of_images_per_object - 1:06}.png"), class_label))
+        return data
 
+
+class ShapeNetCarsGeneratedValidationSet(ShapeNetCarsRecognitionDataset):
+    """ShapeNetCars dataset for a recognition task"""
+
+    def load_data(self, amount_of_images_per_object):
+        object_folders = self.retrieve_object_folders()
+
+        train_data = []
+        for class_label, object_folder in enumerate(object_folders):
+            train_data.append((os.path.join(object_folder, f"0.png"), class_label))
+        return train_data
 
 # root_dir = '/samsung_hdd/Files/AI/TNO/shapenet_renderer/car_renders_train_upper_hemisphere_30_fov_pixel_nerf/cars_val'

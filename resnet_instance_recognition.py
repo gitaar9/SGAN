@@ -8,10 +8,11 @@ from torch import nn, optim
 from torchvision import models, transforms
 
 from resnet_instance_classification.recognition_dataset import ShapeNetCarsRecognitionDataset, \
-    ShapeNetCarsRecognitionDatasetOnlyLastImageIsTest
+    ShapeNetCarsRecognitionDatasetOnlyLastImageIsTest, ShapeNetCarsGeneratedValidationSet
 
 
 def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25, is_inception=False):
+    use_extra_val = False
     since = time.time()
 
     val_acc_history = []
@@ -32,9 +33,15 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
 
             running_loss = 0.0
             running_corrects = 0
+            extra_running_corrects = 0
 
             # Iterate over data.
-            for inputs, labels in dataloaders[phase]:
+            if use_extra_val and phase == 'val':
+                iterator = zip(dataloaders[phase], dataloaders['extra_val'])
+            else:
+                iterator = zip(dataloaders[phase], [[None, None]] * len(dataloaders[phase]))
+
+            for (inputs, labels), (extra_inputs, _) in iterator:
                 inputs = inputs.to(device)
                 labels = labels.to(device)
 
@@ -60,6 +67,12 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
 
                     _, preds = torch.max(outputs, 1)
 
+                    if use_extra_val and phase == 'val':
+                        extra_outputs = model(extra_inputs.to(device))
+                        _, extra_preds = torch.max(outputs + extra_outputs * .5, 1)
+                        extra_running_corrects += torch.sum(extra_preds == labels.data)
+                        print(f"{max(preds)}:{max(extra_preds)}")
+
                     # backward + optimize only if in training phase
                     if phase == 'train':
                         loss.backward()
@@ -71,8 +84,12 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
 
             epoch_loss = running_loss / len(dataloaders[phase].dataset)
             epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
+            if extra_running_corrects != 0:
+                epoch_extra_acc = extra_running_corrects.double() / len(dataloaders[phase].dataset)
+            else:
+                epoch_extra_acc = 0
 
-            print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
+            print('{} Loss: {:.4f} Acc: {:.4f} ({:.4f})'.format(phase, epoch_loss, epoch_acc, epoch_extra_acc))
 
             # deep copy the model
             if phase == 'val' and epoch_acc > best_acc:
@@ -107,7 +124,8 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     if model_name == "resnet":
         """ Resnet18
         """
-        model_ft = models.resnet34(pretrained=use_pretrained)
+        # model_ft = models.resnet34(pretrained=use_pretrained)
+        model_ft = models.resnet18(pretrained=use_pretrained)
         set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.fc.in_features
         model_ft.fc = nn.Linear(num_ftrs, num_classes)
@@ -175,12 +193,18 @@ def load_data(data_dir, dataset_class, input_size, batch_size):
     # Just normalization for validation
     data_transforms = {
         'train': transforms.Compose([
-            transforms.RandomResizedCrop(input_size),
-            transforms.RandomHorizontalFlip(),
+            transforms.RandomResizedCrop(input_size, scale=(.8, 1.)),
+            # transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ]),
         'val': transforms.Compose([
+            transforms.Resize(input_size),
+            transforms.CenterCrop(input_size),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ]),
+        'extra_val': transforms.Compose([
             transforms.Resize(input_size),
             transforms.CenterCrop(input_size),
             transforms.ToTensor(),
@@ -191,23 +215,30 @@ def load_data(data_dir, dataset_class, input_size, batch_size):
     print("Initializing Datasets and Dataloaders...")
 
     # Create training and validation datasets
-    image_datasets = {x: dataset_class(data_dir, is_train=x == 'train', transform=data_transforms[x])
-                      for x in ['train', 'val']}
+    image_datasets = {
+        'train': dataset_class(data_dir, is_train=True, transform=data_transforms['train'], amount_of_images_per_object=31),
+        'val': dataset_class(data_dir, is_train=False, transform=data_transforms['val'], amount_of_images_per_object=31),
+        'extra_val': ShapeNetCarsGeneratedValidationSet('/samsung_hdd/Files/AI/TNO/pixel-nerf/code_testing/final_result_test',
+                                                  is_train=False, transform=data_transforms['val']),
+    }
     # Create training and validation dataloaders
     dataloaders_dict = {
         x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=4) for x in
-        ['train', 'val']}
+        ['train', 'val', 'extra_val']
+    }
 
-    idx = 11
-    image_datasets['train'].show_image(idx * 30)
-    image_datasets['val'].show_image(idx)
+    # idxs = [11, 12, 13]
+    # for idx in idxs:
+    #     image_datasets['train'].show_image(idx * 30)
+    #     image_datasets['val'].show_image(idx)
+    #     image_datasets['extra_val'].show_image(idx)
 
     return dataloaders_dict
 
 
 def main():
 
-    data_dir = '/samsung_hdd/Files/AI/TNO/shapenet_renderer/car_recognition_validation_set'
+    data_dir = '/samsung_hdd/Files/AI/TNO/shapenet_renderer/car_recognition_test_set'
     dataset_class = ShapeNetCarsRecognitionDatasetOnlyLastImageIsTest  # ShapeNetCarsRecognitionDataset
     # Models to choose from [resnet, alexnet, vgg, squeezenet, densenet, inception]
     model_name = "resnet"

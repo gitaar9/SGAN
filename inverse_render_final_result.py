@@ -91,8 +91,6 @@ def create_mp4(frames, output_dir):
     for frame in frames:
         for _ in range(frame_repeat):
             writer.writeFrame(np.array(frame))
-    # for depth in depths:
-    #     writer.writeFrame(np.array(depth))
     writer.close()
 
 
