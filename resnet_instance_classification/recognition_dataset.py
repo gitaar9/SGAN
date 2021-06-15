@@ -48,7 +48,7 @@ class ShapeNetCarsRecognitionDataset(Dataset):
     def __getitem__(self, idx):
         image_path, class_label = self.train_data[idx]
         image = cv2.imread(image_path)
-
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         # if self.is_train:
         #     ksize = random.randint(0, 20)
         #     if ksize > 0:
@@ -65,7 +65,8 @@ class ShapeNetCarsRecognitionDataset(Dataset):
         return image, class_label
 
     def show_image(self, idx):
-        img, _ = self[idx]
+        img, label = self[idx]
+        print(label)
         if isinstance(img, torch.Tensor):
             img = self.tensor_to_PIL(img)
         img.show()
@@ -100,7 +101,10 @@ class ShapeNetCarsGeneratedValidationSet(ShapeNetCarsRecognitionDataset):
 
         train_data = []
         for class_label, object_folder in enumerate(object_folders):
-            train_data.append((os.path.join(object_folder, f"0.png"), class_label))
+            if 'no_view_lock' in object_folder:
+                train_data.append((os.path.join(object_folder, 'rgb', f"0.png"), class_label))
+            else:
+                train_data.append((os.path.join(object_folder, f"0.png"), class_label))
         return train_data
 
 # root_dir = '/samsung_hdd/Files/AI/TNO/shapenet_renderer/car_renders_train_upper_hemisphere_30_fov_pixel_nerf/cars_val'

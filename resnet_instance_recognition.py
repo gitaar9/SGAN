@@ -12,7 +12,7 @@ from resnet_instance_classification.recognition_dataset import ShapeNetCarsRecog
 
 
 def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25, is_inception=False):
-    use_extra_val = False
+    use_extra_val = True
     since = time.time()
 
     val_acc_history = []
@@ -44,6 +44,8 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
             for (inputs, labels), (extra_inputs, _) in iterator:
                 inputs = inputs.to(device)
                 labels = labels.to(device)
+                if extra_inputs is not None:
+                    extra_inputs = extra_inputs.to(device)
 
                 # zero the parameter gradients
                 optimizer.zero_grad()
@@ -67,11 +69,12 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
 
                     _, preds = torch.max(outputs, 1)
 
+                    extra_preds = None
                     if use_extra_val and phase == 'val':
-                        extra_outputs = model(extra_inputs.to(device))
+                        extra_outputs = model(extra_inputs)
+                        # _, extra_preds = torch.max(extra_outputs, 1)
                         _, extra_preds = torch.max(outputs + extra_outputs * .5, 1)
-                        extra_running_corrects += torch.sum(extra_preds == labels.data)
-                        print(f"{max(preds)}:{max(extra_preds)}")
+                        # print(f"{max(preds)}:{max(extra_preds)}")
 
                     # backward + optimize only if in training phase
                     if phase == 'train':
@@ -79,13 +82,15 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
                         optimizer.step()
 
                 # statistics
+                if extra_preds is not None:
+                    extra_running_corrects += torch.sum(extra_preds == labels.data)
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
 
             epoch_loss = running_loss / len(dataloaders[phase].dataset)
             epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
             if extra_running_corrects != 0:
-                epoch_extra_acc = extra_running_corrects.double() / len(dataloaders[phase].dataset)
+                epoch_extra_acc = extra_running_corrects.double() / len(dataloaders['extra_val'].dataset)
             else:
                 epoch_extra_acc = 0
 
@@ -218,20 +223,25 @@ def load_data(data_dir, dataset_class, input_size, batch_size):
     image_datasets = {
         'train': dataset_class(data_dir, is_train=True, transform=data_transforms['train'], amount_of_images_per_object=31),
         'val': dataset_class(data_dir, is_train=False, transform=data_transforms['val'], amount_of_images_per_object=31),
-        'extra_val': ShapeNetCarsGeneratedValidationSet('/samsung_hdd/Files/AI/TNO/pixel-nerf/code_testing/final_result_test',
+        # 'extra_val': dataset_class(data_dir, is_train=False, transform=data_transforms['val'], amount_of_images_per_object=31),
+        # 'extra_val': ShapeNetCarsGeneratedValidationSet('/samsung_hdd/Files/AI/TNO/pixel-nerf/code_testing/final_result_test',
+        #                                           is_train=False, transform=data_transforms['val']),
+        'extra_val': ShapeNetCarsGeneratedValidationSet('/samsung_hdd/Files/AI/TNO/remote_folders/train_pose_from_test_image_remotes/car_view_synthesis_test_set_output_no_view_lock_at_all_700/car_view_synthesis_test_set_output_no_view_lock_at_all_700',
                                                   is_train=False, transform=data_transforms['val']),
+
     }
     # Create training and validation dataloaders
     dataloaders_dict = {
-        x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=4) for x in
-        ['train', 'val', 'extra_val']
+        x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=x == 'train', num_workers=4)
+        for x in ['train', 'val', 'extra_val']
     }
 
-    # idxs = [11, 12, 13]
-    # for idx in idxs:
-    #     image_datasets['train'].show_image(idx * 30)
-    #     image_datasets['val'].show_image(idx)
-    #     image_datasets['extra_val'].show_image(idx)
+    start_idx = 25
+    idxs = range(start_idx, start_idx+3)
+    for idx in idxs:
+        image_datasets['train'].show_image(idx * 30)
+        image_datasets['val'].show_image(idx)
+        image_datasets['extra_val'].show_image(idx)
 
     return dataloaders_dict
 
@@ -278,12 +288,12 @@ def main():
     print("Params to learn:")
     if feature_extract:
         params_to_update = []
-        for name,param in model_ft.named_parameters():
+        for name, param in model_ft.named_parameters():
             if param.requires_grad == True:
                 params_to_update.append(param)
                 print("\t",name)
     else:
-        for name,param in model_ft.named_parameters():
+        for name, param in model_ft.named_parameters():
             if param.requires_grad == True:
                 print("\t",name)
 
