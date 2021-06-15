@@ -12,11 +12,11 @@ ml Python/3.7.4-GCCcore-8.3.0
 source /data/s2576597/SGAN/venv/bin/activate
 
 
-CUDA_VISIBLE_DEVICES=0 python -u eval_metrics.py /scratch/s2576597/SGAN/shapenetcars_sym_loss_hierarchical_v3/generator.pth --real_image_dir=/scratch/s2576597/fid_evaluation/sgan_real_shapenetcar/ --output_dir=/scratch/s2576597/fid_evaluation/shapenetcars_sym_loss_hierarchical_v3/ --max_batch_size=3000000
-CUDA_VISIBLE_DEVICES=0 python -u eval_metrics.py /scratch/s2576597/SGAN/shapenetcars_no_mirror_v3/09--16:22--_100500--generator.pth --real_image_dir=/scratch/s2576597/fid_evaluation/sgan_real_shapenetcar/ --output_dir=/scratch/s2576597/fid_evaluation/shapenetcars_no_mirror_v3/ --max_batch_size=3000000
+CUDA_VISIBLE_DEVICES=0 python -u eval_metrics.py /data/s2576597/SGAN/shapenetcars_sym_loss_hierarchical_v3/generator.pth --real_image_dir=/scratch/s2576597/fid_evaluation/sgan_real_shapenetcar/ --output_dir=/scratch/s2576597/fid_evaluation/shapenetcars_sym_loss_hierarchical_v3/ --max_batch_size=3000000 --num_images=4096
+CUDA_VISIBLE_DEVICES=0 python -u eval_metrics.py /data/s2576597/SGAN/shapenetcars_no_mirror_v3/09--16:22--_100500--generator.pth --real_image_dir=/scratch/s2576597/fid_evaluation/sgan_real_shapenetcar/ --output_dir=/scratch/s2576597/fid_evaluation/shapenetcars_no_mirror_v3/ --max_batch_size=3000000 --num_images=4096
 
-CUDA_VISIBLE_DEVICES=0 python -u eval_metrics.py /data/s2576597/SGAN/carla_sym_loss_hierarchical_v2/generator.pth --real_image_dir=/scratch/s2576597/fid_evaluation/sgan_real_carla/ --output_dir=/scratch/s2576597/fid_evaluation/carla_sym_loss_hierarchical_v2/ --max_batch_size=3000000 --dataset_class=CARLA
-CUDA_VISIBLE_DEVICES=0 python -u eval_metrics.py /data/s2576597/SGAN/carla_no_mirror_v2/generator.pth --real_image_dir=/scratch/s2576597/fid_evaluation/sgan_real_carla/ --output_dir=/scratch/s2576597/fid_evaluation/carla_no_mirror_v2/ --max_batch_size=3000000 --dataset_class=CARLA
+CUDA_VISIBLE_DEVICES=0 python -u eval_metrics.py /data/s2576597/SGAN/carla_sym_loss_hierarchical_v2/generator.pth --real_image_dir=/scratch/s2576597/fid_evaluation/sgan_real_carla/ --output_dir=/scratch/s2576597/fid_evaluation/carla_sym_loss_hierarchical_v2/ --max_batch_size=3000000 --dataset_class=CARLA --num_images=4096
+CUDA_VISIBLE_DEVICES=0 python -u eval_metrics.py /data/s2576597/SGAN/carla_no_mirror_v2/generator.pth --real_image_dir=/scratch/s2576597/fid_evaluation/sgan_real_carla/ --output_dir=/scratch/s2576597/fid_evaluation/carla_no_mirror_v2/ --max_batch_size=3000000 --dataset_class=CARLA --num_images=4096
 
 
 
