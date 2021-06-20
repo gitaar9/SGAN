@@ -37,8 +37,8 @@ class MyBaseDataset(CelebA):
 
         self.transform = transforms.Compose(
             [
-                # transforms.Resize(256),
-                # transforms.CenterCrop(256),
+                transforms.Resize(256),
+                transforms.CenterCrop(256),
                 transforms.ToTensor(),
                 transforms.Normalize([0.5], [0.5]),
                 transforms.RandomHorizontalFlip(p=0.5),
