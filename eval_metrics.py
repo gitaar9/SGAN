@@ -107,8 +107,8 @@ if __name__ == '__main__':
     metrics_dict = calculate_metrics(opt.output_dir, opt.real_image_dir, cuda=True, isc=True, fid=True, kid=True, verbose=False)
     # print(metrics_dict)
     fid = metrics_dict['frechet_inception_distance']
-    kid = metrics_dict['kernel_inception_distance_mean']
-    kid_std = metrics_dict['kernel_inception_distance_std']
+    kid = metrics_dict['kernel_inception_distance_mean'] * 100
+    kid_std = metrics_dict['kernel_inception_distance_std'] * 100
     inception_score = metrics_dict['inception_score_mean']
     print('\n', opt.generator_file.split('/')[-2])
     print(f"{fid:.2f} & {kid:.2f} $\\pm$ {kid_std:.2f} & ? & {inception_score:.2f}")
