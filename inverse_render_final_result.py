@@ -23,6 +23,8 @@ def get_ground_truth_images(image_folder, n_input_views, image_size, device):
 
     transform = transforms.Compose(
         [
+            transforms.Resize(256),
+            transforms.CenterCrop(256),
             transforms.ToTensor(),
             transforms.Normalize([0.5], [0.5]),
             transforms.Resize((image_size, image_size), interpolation=0)

@@ -390,9 +390,14 @@ def new_snship_runs(password):
 
 def final_sncar_runs(password):
     # FID plot
-    local_names = ['carla_sym_loss_hierarchical_v2', 'carla_no_mirror_v2', 'shapenetcars_sym_loss_hierarchical_v3', 'shapenetcars_no_mirror_v3']
-    peregrine_names = ['carla_sym_loss_hierarchical_v2', 'carla_no_mirror_v2', 'shapenetcars_sym_loss_hierarchical_v3', 'shapenetcars_no_mirror_v3']
-    if password:
+    local_names = ['carla_sym_loss_hierarchical_v2', 'carla_no_mirror_v2', 'shapenetcars_sym_loss_hierarchical_v3',
+                   'shapenetcars_no_mirror_v3', 'shapenetships_sym_loss_hierarchical_v3', 'shapenetships_no_mirror_v3']
+    peregrine_names = ['carla_sym_loss_hierarchical_v2', 'carla_no_mirror_v2', 'shapenetcars_sym_loss_hierarchical_v3',
+                       'shapenetcars_no_mirror_v3', 'shapenetships_sym_loss_hierarchical_v3', 'shapenetships_no_mirror_v3']
+
+    sym_local_names = [n for n in local_names if 'no_mirror' not in n]
+
+    if password and False:
         download_files_from_peregrine(
             password=password,
             peregrine_names=peregrine_names,
@@ -404,7 +409,7 @@ def final_sncar_runs(password):
     plot_pi_gan_plots(local_names)
 
     # Sym loss plot
-    if password:
+    if password and False:
         download_files_from_peregrine(
             password=password,
             peregrine_names=peregrine_names,
@@ -413,7 +418,7 @@ def final_sncar_runs(password):
             local_path='mirror_loss_results/sgan_{}_generator_sym.losses'
         )
     plt.figure(1)
-    plot_simple_torch_array_file(['shapenetcars_baseline_hierarchical', 'shapenetcars_sym_loss_hierarchical'], 'mirror_loss_results/sgan_{}_generator_sym.losses', 'Sym loss', 'time', 'loss')
+    plot_simple_torch_array_file(sym_local_names, 'mirror_loss_results/sgan_{}_generator_sym.losses', 'Sym loss', 'time', 'loss')
 
     # Gen loss plot
     if password:
@@ -437,16 +442,15 @@ def final_sncar_runs(password):
             local_path='mirror_loss_results/sgan_{}_max_memories.sizes'
         )
     plt.figure(3)
-    local_names = [n for n in local_names if 'no_mirror' not in n]
-    plot_simple_torch_array_file(local_names, 'mirror_loss_results/sgan_{}_max_memories.sizes', 'Max GPU mem', 'time', 'Memory')
+    plot_simple_torch_array_file(sym_local_names, 'mirror_loss_results/sgan_{}_max_memories.sizes', 'Max GPU mem', 'time', 'Memory')
 
     plt.show()
 
 
 def main():
     password = getpass()
-    final_sncar_runs(password)
-    # new_snship_runs(password)
+    # final_sncar_runs(password)
+    new_snship_runs(password)
     # snships_mirror_l2_hierarchical(password)
     # sncar_mirror_l2_hierarchical(password)
     # snships_mirror_l2(password)
