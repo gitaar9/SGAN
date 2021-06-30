@@ -62,6 +62,15 @@ class ShapenetShips(MyBaseDataset):
         self.data = glob.glob('/scratch/s2576597/pixel_nerf_datasets/ship_renders_train_upper_hemisphere_30_fov_v2_pixel_nerf/ships_train/*/rgb/*.png')
 
 
+class ShapenetShipsTest(MyBaseDataset):
+    def __init__(self, img_size, **kwargs):
+        super().__init__(img_size)
+
+        # self.data = glob.glob('/home/gitaar9/AI/TNO/shapenet_renderer/ship_renders/*/*/rgb/*.png')
+        # self.data = glob.glob('/scratch/s2576597/graf_datasets/ship_renders_train_upper_hemisphere_30_fov/*/rgb/*.png')
+        self.data = glob.glob('/scratch/s2576597/pixel_nerf_datasets/ship_renders_train_upper_hemisphere_30_fov_v2_pixel_nerf/ships_test/*/rgb/*.png')
+
+
 class ShapenetCars(MyBaseDataset):
     def __init__(self, img_size, **kwargs):
         super().__init__(img_size)

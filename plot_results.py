@@ -390,14 +390,21 @@ def new_snship_runs(password):
 
 def final_sncar_runs(password):
     # FID plot
-    local_names = ['carla_sym_loss_hierarchical_v2', 'carla_no_mirror_v2', 'shapenetcars_sym_loss_hierarchical_v3',
+    old_local_names = ['carla_sym_loss_hierarchical_v2', 'carla_no_mirror_v2', 'shapenetcars_sym_loss_hierarchical_v3',
                    'shapenetcars_no_mirror_v3', 'shapenetships_sym_loss_hierarchical_v3', 'shapenetships_no_mirror_v3']
-    peregrine_names = ['carla_sym_loss_hierarchical_v2', 'carla_no_mirror_v2', 'shapenetcars_sym_loss_hierarchical_v3',
+    old_local_names = ['shapenetcars_sym_loss_hierarchical_v3', 'shapenetcars_no_mirror_v3']
+    old_peregrine_names = ['carla_sym_loss_hierarchical_v2', 'carla_no_mirror_v2', 'shapenetcars_sym_loss_hierarchical_v3',
                        'shapenetcars_no_mirror_v3', 'shapenetships_sym_loss_hierarchical_v3', 'shapenetships_no_mirror_v3']
 
-    sym_local_names = [n for n in local_names if 'no_mirror' not in n]
+    local_names = ['carla_sym_loss_hierarchical_v3', 'carla_no_mirror_v3', 'shapenetships_sym_loss_hierarchical_v4',
+                   'shapenetships_no_mirror_v4']
+    peregrine_names = ['carla_sym_loss_hierarchical_v3', 'carla_no_mirror_v3', 'shapenetships_sym_loss_hierarchical_v4',
+                       'shapenetships_no_mirror_v4']
 
-    if password and False:
+    sym_local_names = [n for n in local_names if 'no_mirror' not in n]
+    old_sym_local_names = [n for n in old_local_names if 'no_mirror' not in n]
+
+    if password:
         download_files_from_peregrine(
             password=password,
             peregrine_names=peregrine_names,
@@ -406,10 +413,10 @@ def final_sncar_runs(password):
             local_path='mirror_loss_results/sgan_{}_fid.txt'
         )
     plt.figure(0)
-    plot_pi_gan_plots(local_names)
+    plot_pi_gan_plots(local_names + old_local_names)
 
     # Sym loss plot
-    if password and False:
+    if password:
         download_files_from_peregrine(
             password=password,
             peregrine_names=peregrine_names,
@@ -418,7 +425,7 @@ def final_sncar_runs(password):
             local_path='mirror_loss_results/sgan_{}_generator_sym.losses'
         )
     plt.figure(1)
-    plot_simple_torch_array_file(sym_local_names, 'mirror_loss_results/sgan_{}_generator_sym.losses', 'Sym loss', 'time', 'loss')
+    plot_simple_torch_array_file(sym_local_names + old_sym_local_names, 'mirror_loss_results/sgan_{}_generator_sym.losses', 'Sym loss', 'time', 'loss')
 
     # Gen loss plot
     if password:
@@ -430,7 +437,7 @@ def final_sncar_runs(password):
             local_path='mirror_loss_results/sgan_{}_generator.losses'
         )
     plt.figure(2)
-    plot_simple_torch_array_file(local_names, 'mirror_loss_results/sgan_{}_generator.losses', 'Gen loss', 'time', 'loss')
+    plot_simple_torch_array_file(local_names + old_local_names, 'mirror_loss_results/sgan_{}_generator.losses', 'Gen loss', 'time', 'loss')
 
     # Max GPU memory
     if password:
@@ -442,15 +449,28 @@ def final_sncar_runs(password):
             local_path='mirror_loss_results/sgan_{}_max_memories.sizes'
         )
     plt.figure(3)
-    plot_simple_torch_array_file(sym_local_names, 'mirror_loss_results/sgan_{}_max_memories.sizes', 'Max GPU mem', 'time', 'Memory')
+    plot_simple_torch_array_file(sym_local_names + old_sym_local_names, 'mirror_loss_results/sgan_{}_max_memories.sizes', 'Max GPU mem', 'time', 'Memory')
 
     plt.show()
+    '''
+    'shapenetships_sym_loss_hierarchical_v4', 'shapenetships_no_mirror_v4'
+    shapenetships no mirror: 100 000
+    shapenetships sym loss: 100 000
+    
+    'shapenetcars_sym_loss_hierarchical_v3', 'shapenetcars_no_mirror_v3'
+    shapenetcars no mirror: 100 000
+    shapenetcars sym loss: last epoch
+    
+    'carla_sym_loss_hierarchical_v3', 'carla_no_mirror_v3'
+    carla no mirror: last epoch
+    carla sym loss: 180 000
+    '''
 
 
 def main():
     password = getpass()
-    # final_sncar_runs(password)
-    new_snship_runs(password)
+    final_sncar_runs(password)
+    # new_snship_runs(password)
     # snships_mirror_l2_hierarchical(password)
     # sncar_mirror_l2_hierarchical(password)
     # snships_mirror_l2(password)

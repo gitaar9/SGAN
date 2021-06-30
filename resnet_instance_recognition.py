@@ -15,7 +15,7 @@ from resnet_instance_classification.recognition_dataset import ShapeNetCarsRecog
 from resnet_instance_classification.simple_dataset import SimpleShapenetRecognitionDataset
 
 
-def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25, is_inception=False):
+def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25, is_inception=False, verbose=True):
     use_extra_val = False
     since = time.time()
 
@@ -25,7 +25,8 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
     best_acc = 0.0
 
     for epoch in range(num_epochs):
-        print('Epoch {}/{}'.format(epoch, num_epochs - 1))
+        if verbose:
+            print('Epoch {}/{}'.format(epoch, num_epochs - 1))
         # print('-' * 10)
 
         # Each epoch has a training and validation phase
@@ -98,7 +99,8 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
             else:
                 epoch_extra_acc = 0
 
-            print('{} Loss: {:.4f} Acc: {:.4f} ({:.4f})'.format(phase, epoch_loss, epoch_acc, epoch_extra_acc))
+            if verbose:
+                print('{} Loss: {:.4f} Acc: {:.4f} ({:.4f})'.format(phase, epoch_loss, epoch_acc, epoch_extra_acc))
 
             # deep copy the model
             if phase == 'val' and epoch_acc > best_acc:
@@ -106,8 +108,8 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
                 best_model_wts = copy.deepcopy(model.state_dict())
             if phase == 'val':
                 val_acc_history.append(epoch_acc)
-
-        print()
+        if verbose:
+            print()
 
     time_elapsed = time.time() - since
     print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
@@ -250,13 +252,13 @@ def load_data(root_dir, extra_root_dir=None, amount_train_images=30, amount_extr
     }
 
     # start_idx = 25
-    # idxs = range(start_idx, start_idx+1)
+    # idxs = range(start_idx, start_idx+5)
     # for idx in idxs:
     #     image_datasets['train'].show_image(idx * amount_train_images)
-    #     if amount_extra_train_images > 0:
-    #         image_datasets['train'].show_image(len(image_datasets['train']) // 2 + idx * amount_train_images)
-    #         print(len(image_datasets['val']))
-    #     image_datasets['val'].show_image(idx)
+    #     # if amount_extra_train_images > 0:
+    #     #     image_datasets['train'].show_image(len(image_datasets['train']) // 2 + idx * amount_train_images)
+    #     #     print(len(image_datasets['val']))
+    #     image_datasets['val'].show_image(idx * amount_validation_images)
 
     return dataloaders_dict
 
@@ -288,7 +290,7 @@ def set_feature_extract_model(feature_extract, model):
 
 
 def main(root_dir, extra_root_dir=None, amount_train_images=30, amount_extra_train_images=0, amount_validation_images=1,
-         start_validation_idx=60, batch_size=8, num_epochs=15, initial_feature_extract_epochs=3):
+         start_validation_idx=60, batch_size=8, num_epochs=15, initial_feature_extract_epochs=3, verbose=True):
     # Models to choose from [resnet, alexnet, vgg, squeezenet, densenet, inception]
     model_name = "resnet"
 
@@ -337,7 +339,8 @@ def main(root_dir, extra_root_dir=None, amount_train_images=30, amount_extra_tra
         optimizer_ft,
         device=device,
         num_epochs=initial_feature_extract_epochs,
-        is_inception=(model_name == "inception")
+        is_inception=(model_name == "inception"),
+        verbose=verbose
     )
 
     # TRAIN ALL LAYERS
@@ -351,7 +354,8 @@ def main(root_dir, extra_root_dir=None, amount_train_images=30, amount_extra_tra
         optimizer_ft,
         device=device,
         num_epochs=num_epochs - initial_feature_extract_epochs,
-        is_inception=(model_name == "inception")
+        is_inception=(model_name == "inception"),
+        verbose=verbose
     )
 
     return best_accuracy.cpu()
@@ -381,7 +385,7 @@ if __name__ == '__main__':
 
     final_best_accs = []
     for run in range(opt.num_runs):
-
+        print(f"{run + 1}/{opt.num_runs}")
         best_acc = main(
             root_dir=opt.root_dir,
             extra_root_dir=opt.extra_root_dir,
@@ -391,7 +395,8 @@ if __name__ == '__main__':
             start_validation_idx=opt.start_validation_idx,
             batch_size=opt.batch_size,
             num_epochs=opt.num_epochs,
-            initial_feature_extract_epochs=opt.initial_feature_extract_epochs
+            initial_feature_extract_epochs=opt.initial_feature_extract_epochs,
+            verbose=opt.num_runs == 1
         )
         final_best_accs.append(best_acc)
 
@@ -407,3 +412,4 @@ if __name__ == '__main__':
 # python resnet_instance_recognition.py --root_dir=/samsung_hdd/Files/AI/TNO/shapenet_renderer/car_recognition_drone_test_set/cars_test --num_epochs=15 --num_runs=4 --amount_validation_images=10
 # python resnet_instance_recognition.py --root_dir=/samsung_hdd/Files/AI/TNO/shapenet_renderer/car_recognition_drone_test_set/cars_test --num_epochs=15 --num_runs=4 --amount_validation_images=10 --amount_extra_train_images=30 --extra_root_dir=/samsung_hdd/Files/AI/TNO/remote_folders/pixel_nerf_eval/pixel_nerf_eval_output/sncar/drone/data_augmentation_sym_loss
 # python resnet_instance_recognition.py --root_dir=/samsung_hdd/Files/AI/TNO/shapenet_renderer/car_recognition_drone_test_set/cars_test --num_epochs=15 --num_runs=4 --amount_validation_images=10 --amount_extra_train_images=30 --extra_root_dir=/samsung_hdd/Files/AI/TNO/remote_folders/pixel_nerf_eval/pixel_nerf_eval_output/sncar/drone/data_augmentation_no_mirror
+
