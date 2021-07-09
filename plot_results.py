@@ -396,10 +396,10 @@ def final_sncar_runs(password):
     old_peregrine_names = ['carla_sym_loss_hierarchical_v2', 'carla_no_mirror_v2', 'shapenetcars_sym_loss_hierarchical_v3',
                        'shapenetcars_no_mirror_v3', 'shapenetships_sym_loss_hierarchical_v3', 'shapenetships_no_mirror_v3']
 
-    local_names = ['carla_sym_loss_hierarchical_v3', 'carla_no_mirror_v3', 'shapenetships_sym_loss_hierarchical_v4',
-                   'shapenetships_no_mirror_v4']
-    peregrine_names = ['carla_sym_loss_hierarchical_v3', 'carla_no_mirror_v3', 'shapenetships_sym_loss_hierarchical_v4',
-                       'shapenetships_no_mirror_v4']
+    local_names = ['carla_no_mirror_v3', 'shapenetships_sym_loss_hierarchical_v4',
+                   'shapenetships_no_mirror_v4', 'carla_sym_loss_hierarchical_v3_again']
+    peregrine_names = ['carla_no_mirror_v3', 'shapenetships_sym_loss_hierarchical_v4',
+                       'shapenetships_no_mirror_v4', 'carla_sym_loss_hierarchical_v3_again']
 
     sym_local_names = [n for n in local_names if 'no_mirror' not in n]
     old_sym_local_names = [n for n in old_local_names if 'no_mirror' not in n]

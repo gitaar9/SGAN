@@ -57,13 +57,13 @@ def setup_evaluation(dataset_name, real_image_dir, target_size=128):
     # Only make real images if they haven't been made yet
 
     generate_new_real_images = not os.path.exists(real_image_dir) or \
-                               len(glob.glob(os.path.join(real_image_dir, '*.jpg'))) < 8000
+                               len(glob.glob(os.path.join(real_image_dir, '*.jpg'))) < 10000
 
     if generate_new_real_images:
         os.makedirs(real_image_dir)
         dataloader, CHANNELS = datasets.get_dataset(dataset_name, img_size=target_size)
         print('outputting real images...')
-        output_real_images(dataloader, 8000, real_image_dir)
+        output_real_images(dataloader, 10000, real_image_dir)
         print('...done')
 
 
