@@ -209,8 +209,8 @@ def render_folder(generator, folder_path, image_size, output_dir, options, rende
     # Inference poses:
     img_yaws = [yaw_and_pitches[0][0]] + list(yaw_and_pitches[30:60, 0])
     img_pitches = [yaw_and_pitches[0][1]] + list(yaw_and_pitches[30:60, 1])
-
-    image_h_means = [-yaw_from_renderer + (math.pi * 0.75) - (0.5 * math.pi) for yaw_from_renderer in img_yaws]
+     # Flip the - .5 Pi if the objects are reversed
+    image_h_means = [-yaw_from_renderer + (math.pi * 0.75) + (0.5 * math.pi) for yaw_from_renderer in img_yaws]
     # if False:  # For new no mirror generator add this
     #     image_h_means = [h - (math.pi / 100) * 64 for h in image_h_means]
     image_v_means = [(math.pi / 2 * 85 / 90) - pitch_from_renderer for pitch_from_renderer in img_pitches]
