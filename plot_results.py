@@ -31,6 +31,7 @@ def plot_array(a, label=None):
 
 
 def show_plot(title, x_label, y_label, x_axis_limit=None, y_lims=None):
+
     plt.title(title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
@@ -39,11 +40,14 @@ def show_plot(title, x_label, y_label, x_axis_limit=None, y_lims=None):
         plt.xlim((0, x_axis_limit))
     if y_lims is not None:
         plt.ylim(y_lims)
+    t = plt.rcParamsDefault["figure.figsize"]
+    plt.rcParams["figure.figsize"] = (t[0] * 2, t[1] * 2)
 
 
 def all_plotting(dataset_names, json_path, *args, **kwargs):
-    for ds_name in dataset_names:
-        plot_array(load_array_from_tb_json(json_path.format(ds_name)), ds_name)
+    legend_names = kwargs.pop('legend_names') or dataset_names
+    for ds_name, legend_name in zip(dataset_names, legend_names):
+        plot_array(load_array_from_tb_json(json_path.format(ds_name)), legend_name)
     show_plot(*args, **kwargs)
 
 
@@ -392,14 +396,17 @@ def final_sncar_runs(password):
     # FID plot
     old_local_names = ['carla_sym_loss_hierarchical_v2', 'carla_no_mirror_v2', 'shapenetcars_sym_loss_hierarchical_v3',
                    'shapenetcars_no_mirror_v3', 'shapenetships_sym_loss_hierarchical_v3', 'shapenetships_no_mirror_v3']
-    old_local_names = ['shapenetcars_sym_loss_hierarchical_v3', 'shapenetcars_no_mirror_v3']
+    old_local_names = []
     old_peregrine_names = ['carla_sym_loss_hierarchical_v2', 'carla_no_mirror_v2', 'shapenetcars_sym_loss_hierarchical_v3',
                        'shapenetcars_no_mirror_v3', 'shapenetships_sym_loss_hierarchical_v3', 'shapenetships_no_mirror_v3']
+    # old_local_names = []
 
-    local_names = ['carla_no_mirror_v3', 'shapenetships_sym_loss_hierarchical_v4',
-                   'shapenetships_no_mirror_v4', 'carla_sym_loss_hierarchical_v3_again']
-    peregrine_names = ['carla_no_mirror_v3', 'shapenetships_sym_loss_hierarchical_v4',
-                       'shapenetships_no_mirror_v4', 'carla_sym_loss_hierarchical_v3_again']
+    local_names = ['carla_no_mirror_v3', 'carla_sym_loss_hierarchical_v3_again', 'shapenetcars_no_mirror_v3',
+                   'shapenetcars_sym_loss_hierarchical_v3', 'shapenetships_no_mirror_v4',
+                   'shapenetships_sym_loss_hierarchical_v4']
+    peregrine_names = ['carla_no_mirror_v3', 'carla_sym_loss_hierarchical_v3_again', 'shapenetcars_no_mirror_v3',
+                       'shapenetcars_sym_loss_hierarchical_v3', 'shapenetships_no_mirror_v4',
+                       'shapenetships_sym_loss_hierarchical_v4']
 
     sym_local_names = [n for n in local_names if 'no_mirror' not in n]
     old_sym_local_names = [n for n in old_local_names if 'no_mirror' not in n]
@@ -413,7 +420,9 @@ def final_sncar_runs(password):
             local_path='mirror_loss_results/sgan_{}_fid.txt'
         )
     plt.figure(0)
-    plot_pi_gan_plots(local_names + old_local_names)
+    legend_names = ['CARLA only adversarial', 'CARLA adversarial+symmetric', 'Cars only adversarial',
+                    'Cars adversarial+symmetric', 'Ships only adversarial', 'Ships adversarial+symmetric']
+    plot_pi_gan_plots(local_names=local_names + old_local_names, legend_names=legend_names)
 
     # Sym loss plot
     if password:

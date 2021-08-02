@@ -11,7 +11,9 @@ ml Python/3.7.4-GCCcore-8.3.0
 
 source /data/s2576597/SGAN/venv/bin/activate
 
-CUDA_VISIBLE_DEVICES=0 python -u inverse_render_dataset.py /data/s2576597/SGAN/shapenetships_sym_loss_hierarchical_v4/26--18:11--_105000--generator.pth /scratch/s2576597/pixel_nerf_datasets/ship_recognition_drone_test_set/ships_test --n_input_views=1 --image_size 128 --output_dir=/scratch/s2576597/SGAN_recognition/snship/drone/sym_loss/
+CUDA_VISIBLE_DEVICES=0 python -u inverse_render_dataset.py /data/s2576597/SGAN/shapenetcars_sym_loss_hierarchical_v3/generator.pth /scratch/s2576597/pixel_nerf_datasets/car_recognition_drone_test_set_new/cars_test --n_input_views=1 --image_size 128 --output_dir=/scratch/s2576597/SGAN_recognition/sncar/drone/sym_loss/
+
+#CUDA_VISIBLE_DEVICES=0 python -u inverse_render_dataset.py /data/s2576597/SGAN/shapenetships_sym_loss_hierarchical_v4/26--18:11--_105000--generator.pth /scratch/s2576597/pixel_nerf_datasets/ship_recognition_drone_test_set/ships_test --n_input_views=1 --image_size 128 --output_dir=/scratch/s2576597/SGAN_recognition/snship/drone/sym_loss/
 
 #CUDA_VISIBLE_DEVICES=0 python -u inverse_render_dataset_creation.py /scratch/s2576597/old_SGAN/shapenetcars_sym_loss_hierarchical/17--20:36--generator.pth /scratch/s2576597/new_view_synthesis_datasets/car_view_synthesis_test_set/ --output_dir /scratch/s2576597/new_view_synthesis_datasets/car_view_synthesis_test_set_output_no_view_lock_at_all_700/ --image_size 128 --n_iterations=700
 
