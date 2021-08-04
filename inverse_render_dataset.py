@@ -201,7 +201,7 @@ def find_latent_z(
 
 
 def render_folder(generator, folder_path, image_size, output_dir, options, render_options, max_batch_size,
-                  lock_view_dependence, use_view_lock_for_optimization):
+                  lock_view_dependence, use_view_lock_for_optimization, add_to_yaw=0.):
     # Load one or multiple images
     gt_images = get_ground_truth_images(folder_path, 1, image_size, device)
 
@@ -210,9 +210,7 @@ def render_folder(generator, folder_path, image_size, output_dir, options, rende
     img_yaws = [yaw_and_pitches[0][0]] + list(yaw_and_pitches[30:60, 0])
     img_pitches = [yaw_and_pitches[0][1]] + list(yaw_and_pitches[30:60, 1])
      # Flip the - .5 Pi if the objects are reversed
-    image_h_means = [-yaw_from_renderer + (math.pi * 0.75) + (0.5 * math.pi) - 2.3 for yaw_from_renderer in img_yaws]
-    # if False:  # For new no mirror generator add this
-    #     image_h_means = [h - (math.pi / 100) * 64 for h in image_h_means]
+    image_h_means = [-yaw_from_renderer + (math.pi * 0.75) + (0.5 * math.pi) + add_to_yaw for yaw_from_renderer in img_yaws]
     image_v_means = [(math.pi / 2 * 85 / 90) - pitch_from_renderer for pitch_from_renderer in img_pitches]
 
     gt_h_means = image_h_means[:1]
@@ -299,7 +297,7 @@ def main(opt, device):
     }
 
     object_folders = glob.glob(os.path.join(opt.image_path, '*'))
-    for object_folder in object_folders:
+    for object_folder in reversed(object_folders):
         render_folder(
             generator=generator,
             folder_path=object_folder,
@@ -309,7 +307,8 @@ def main(opt, device):
             render_options=render_options,
             max_batch_size=opt.max_batch_size,
             lock_view_dependence=lock_view_dependence,
-            use_view_lock_for_optimization=opt.use_view_lock_for_optimization
+            use_view_lock_for_optimization=opt.use_view_lock_for_optimization,
+            add_to_yaw=opt.add_to_yaw
         )
 
 
@@ -326,6 +325,7 @@ if __name__ == '__main__':
     parser.add_argument('--n_input_views', type=int, default=1)
     parser.add_argument('--use_view_lock_for_optimization', action='store_true')
     parser.add_argument('--change_yaw', action='store_true')
+    parser.add_argument('--add_to_yaw', type=float, default=0.)
 
     input_args = parser.parse_args()
     Path(input_args.output_dir).mkdir(parents=True, exist_ok=True)
