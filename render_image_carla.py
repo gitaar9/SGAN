@@ -65,12 +65,17 @@ yaw_from_renderer = -0.99701956  # 03 halfcontainer
 pitch_from_renderer = 0.32446663   # 03 halfcontainer
 # yaw_from_renderer = -1.86428757  # 08 romanrow
 # pitch_from_renderer = 0.64206937   # 08 romanrow
-yaw_from_renderer = -math.pi/2
+yaw_from_renderer = -math.pi/4
 pitch_from_renderer = math.radians(35)
+
+# new for testing shapenetcars_no_mirror_v3
+yaw_from_renderer = 2.8194970895847584
+yaw_from_renderer = math.pi
+pitch_from_renderer = 0.0014992612891733656
 
 
 curriculum['v_mean'] = (math.pi / 2 * 85 / 90) - pitch_from_renderer
-curriculum['h_mean'] = -yaw_from_renderer + (math.pi * 0.75) - (0.5 * math.pi) - (math.pi / 100) * 64
+curriculum['h_mean'] = -yaw_from_renderer + (math.pi * 0.75) + (0.5 * math.pi) + (-2.3)  # The last term is specific for shapenetcars_no_mirror_v3
 
 print(f"Pi-GAN space v_mean: {curriculum['v_mean']}, h_mean: {curriculum['h_mean']}")
 

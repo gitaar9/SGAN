@@ -223,6 +223,8 @@ def load_data(root_dir, extra_root_dir=None, amount_train_images=30, amount_extr
         ]),
     }
 
+
+
     print("Initializing Datasets and Dataloaders...")
 
     # Create training and validation datasets
@@ -250,6 +252,7 @@ def load_data(root_dir, extra_root_dir=None, amount_train_images=30, amount_extr
         x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=x == 'train', num_workers=4)
         for x in ['train', 'val']
     }
+
 
     # start_idx = 25
     # idxs = range(start_idx, start_idx+5)
