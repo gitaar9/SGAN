@@ -99,6 +99,7 @@ def plot_pi_gan_plots(local_names, *args, **kwargs):
         *args,
         **kwargs
     )
+    plt.ylim((20, 150))
 
 
 def download_files_from_peregrine(password, peregrine_names, local_names, peregrine_path, local_path):
@@ -478,10 +479,10 @@ def final_sncar_runs(password):
 
 def high_bs_final_sncar_runs(password):
     # FID plot
-    local_names = ['shapenetcars_high_batch_size', 'shapenetcars_sym_loss_high_batch_size']
-    peregrine_names = ['shapenetcars_high_batch_size', 'shapenetcars_sym_loss_high_batch_size']
+    local_names = ['shapenetcars_high_batch_size', 'shapenetcars_sym_loss_high_batch_size', 'shapenetcars_high_batch_size_2']
+    peregrine_names = ['shapenetcars_high_batch_size', 'shapenetcars_sym_loss_high_batch_size', 'shapenetcars_high_batch_size_2']
 
-    sym_local_names = [n for n in local_names[1:] if 'no_mirror' not in n]
+    sym_local_names = [n for n in local_names[1:2] if 'no_mirror' not in n]
 
     if password:
         download_files_from_peregrine(
