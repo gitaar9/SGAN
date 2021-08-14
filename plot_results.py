@@ -45,7 +45,7 @@ def show_plot(title, x_label, y_label, x_axis_limit=None, y_lims=None):
 
 
 def all_plotting(dataset_names, json_path, *args, **kwargs):
-    legend_names = kwargs.pop('legend_names') or dataset_names
+    legend_names = kwargs.pop('legend_names', None) or dataset_names
     for ds_name, legend_name in zip(dataset_names, legend_names):
         plot_array(load_array_from_tb_json(json_path.format(ds_name)), legend_name)
     show_plot(*args, **kwargs)
@@ -479,8 +479,9 @@ def final_sncar_runs(password):
 
 def high_bs_final_sncar_runs(password):
     # FID plot
-    local_names = ['shapenetcars_high_batch_size', 'shapenetcars_sym_loss_high_batch_size', 'shapenetcars_high_batch_size_2']
-    peregrine_names = ['shapenetcars_high_batch_size', 'shapenetcars_sym_loss_high_batch_size', 'shapenetcars_high_batch_size_2']
+    local_names = ['shapenetcars_high_batch_size', 'shapenetcars_sym_loss_high_batch_size',
+                   'shapenetcars_high_batch_size_2', 'shapenetcars_high_batch_size_3']
+    peregrine_names = local_names
 
     sym_local_names = [n for n in local_names[1:2] if 'no_mirror' not in n]
 
@@ -493,9 +494,9 @@ def high_bs_final_sncar_runs(password):
             local_path='mirror_loss_results/sgan_{}_fid.txt'
         )
     plt.figure(0)
-    legend_names = ['CARLA only adversarial', 'CARLA adversarial+symmetric', 'Cars only adversarial',
-                    'Cars adversarial+symmetric', 'Ships only adversarial', 'Ships adversarial+symmetric']
-    plot_pi_gan_plots(local_names=local_names, legend_names=legend_names)
+    # legend_names = ['CARLA only adversarial', 'CARLA adversarial+symmetric', 'Cars only adversarial',
+    #                 'Cars adversarial+symmetric', 'Ships only adversarial', 'Ships adversarial+symmetric']
+    plot_pi_gan_plots(local_names=local_names)#, legend_names=legend_names)
 
     # Sym loss plot
     if password:
@@ -519,7 +520,7 @@ def high_bs_final_sncar_runs(password):
             local_path='mirror_loss_results/sgan_{}_generator.losses'
         )
     plt.figure(2)
-    plot_simple_torch_array_file(local_names , 'mirror_loss_results/sgan_{}_generator.losses', 'Gen loss', 'time', 'loss')
+    plot_simple_torch_array_file(local_names, 'mirror_loss_results/sgan_{}_generator.losses', 'Gen loss', 'time', 'loss')
 
     # Max GPU memory
     if password:

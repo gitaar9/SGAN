@@ -304,9 +304,10 @@ SHAPENETSHIPS_NO_MIRROR_V3 = {
 }
 
 SHAPENETCARS_SYM_LOSS_HIGH_BATCH_SIZE = {
-    0: {'batch_size': 60, 'num_steps': 29, 'img_size': 32, 'batch_split': 1, 'gen_lr': 4e-5, 'disc_lr': 4e-4},
-    int(30e3): {'batch_size': 32, 'num_steps': 29, 'img_size': 64, 'batch_split': 4, 'gen_lr': 2e-5, 'disc_lr': 2e-4},
-    int(75e3): {'batch_size': 32, 'num_steps': 29, 'img_size': 128, 'batch_split': 16, 'gen_lr': 10e-6, 'disc_lr': 10e-5},
+    0: {'batch_size': 60, 'num_steps': 29, 'img_size': 32, 'batch_split': 1, 'gen_lr': 8e-5, 'disc_lr': 4e-4},
+    int(30e3): {'batch_size': 32, 'num_steps': 29, 'img_size': 64, 'batch_split': 4, 'gen_lr': 4e-5, 'disc_lr': 2e-4},
+    int(75e3): {'batch_size': 32, 'num_steps': 29, 'img_size': 128, 'batch_split': 16, 'gen_lr': 3e-7, 'disc_lr': 3e-6},
+    # _2 double learning rate for earlier steps
     int(200e3): {},
 
     'fov': 30,
