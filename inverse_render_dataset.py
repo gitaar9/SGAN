@@ -251,7 +251,7 @@ def render_folder(generator, folder_path, image_size, output_dir, options, rende
             lock_view_dependence=lock_view_dependence,
             render_options=render_options
         )
-        image_idx = idx if idx == 0 else idx + 29
+        image_idx = idx if idx == 0 else idx + (inference_start_idx - 1)
         image_name = f'{image_idx:06d}.png'
         save_image(img, f"{output_path}/{image_name}", normalize=True)
 
