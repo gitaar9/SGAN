@@ -480,7 +480,8 @@ def final_sncar_runs(password):
 def high_bs_final_sncar_runs(password):
     # FID plot
     local_names = ['shapenetcars_high_batch_size', 'shapenetcars_sym_loss_high_batch_size',
-                   'shapenetcars_high_batch_size_2', 'shapenetcars_high_batch_size_3']
+                   'shapenetcars_high_batch_size_2', 'shapenetcars_high_batch_size_3',
+                   'shapenetcars_sym_loss_high_batch_size_2']
     peregrine_names = local_names
 
     sym_local_names = [n for n in local_names[1:2] if 'no_mirror' not in n]
@@ -498,41 +499,41 @@ def high_bs_final_sncar_runs(password):
     #                 'Cars adversarial+symmetric', 'Ships only adversarial', 'Ships adversarial+symmetric']
     plot_pi_gan_plots(local_names=local_names)#, legend_names=legend_names)
 
-    # Sym loss plot
-    if password:
-        download_files_from_peregrine(
-            password=password,
-            peregrine_names=peregrine_names,
-            local_names=local_names,
-            peregrine_path='/data/s2576597/SGAN/{}/generator_sym.losses',
-            local_path='mirror_loss_results/sgan_{}_generator_sym.losses'
-        )
-    plt.figure(1)
-    plot_simple_torch_array_file(sym_local_names, 'mirror_loss_results/sgan_{}_generator_sym.losses', 'Sym loss', 'time', 'loss')
-
-    # Gen loss plot
-    if password:
-        download_files_from_peregrine(
-            password=password,
-            peregrine_names=peregrine_names,
-            local_names=local_names,
-            peregrine_path='/data/s2576597/SGAN/{}/generator.losses',
-            local_path='mirror_loss_results/sgan_{}_generator.losses'
-        )
-    plt.figure(2)
-    plot_simple_torch_array_file(local_names, 'mirror_loss_results/sgan_{}_generator.losses', 'Gen loss', 'time', 'loss')
-
-    # Max GPU memory
-    if password:
-        download_files_from_peregrine(
-            password=password,
-            peregrine_names=peregrine_names,
-            local_names=local_names,
-            peregrine_path='/data/s2576597/SGAN/{}/max_memories.sizes',
-            local_path='mirror_loss_results/sgan_{}_max_memories.sizes'
-        )
-    plt.figure(3)
-    plot_simple_torch_array_file(sym_local_names, 'mirror_loss_results/sgan_{}_max_memories.sizes', 'Max GPU mem', 'time', 'Memory')
+    # # Sym loss plot
+    # if password:
+    #     download_files_from_peregrine(
+    #         password=password,
+    #         peregrine_names=peregrine_names,
+    #         local_names=local_names,
+    #         peregrine_path='/data/s2576597/SGAN/{}/generator_sym.losses',
+    #         local_path='mirror_loss_results/sgan_{}_generator_sym.losses'
+    #     )
+    # plt.figure(1)
+    # plot_simple_torch_array_file(sym_local_names, 'mirror_loss_results/sgan_{}_generator_sym.losses', 'Sym loss', 'time', 'loss')
+    #
+    # # Gen loss plot
+    # if password:
+    #     download_files_from_peregrine(
+    #         password=password,
+    #         peregrine_names=peregrine_names,
+    #         local_names=local_names,
+    #         peregrine_path='/data/s2576597/SGAN/{}/generator.losses',
+    #         local_path='mirror_loss_results/sgan_{}_generator.losses'
+    #     )
+    # plt.figure(2)
+    # plot_simple_torch_array_file(local_names, 'mirror_loss_results/sgan_{}_generator.losses', 'Gen loss', 'time', 'loss')
+    #
+    # # Max GPU memory
+    # if password:
+    #     download_files_from_peregrine(
+    #         password=password,
+    #         peregrine_names=peregrine_names,
+    #         local_names=local_names,
+    #         peregrine_path='/data/s2576597/SGAN/{}/max_memories.sizes',
+    #         local_path='mirror_loss_results/sgan_{}_max_memories.sizes'
+    #     )
+    # plt.figure(3)
+    # plot_simple_torch_array_file(sym_local_names, 'mirror_loss_results/sgan_{}_max_memories.sizes', 'Max GPU mem', 'time', 'Memory')
 
     plt.show()
 

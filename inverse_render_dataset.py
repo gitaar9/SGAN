@@ -201,14 +201,15 @@ def find_latent_z(
 
 
 def render_folder(generator, folder_path, image_size, output_dir, options, render_options, max_batch_size,
-                  lock_view_dependence, use_view_lock_for_optimization, add_to_yaw=0.):
+                  lock_view_dependence, use_view_lock_for_optimization, add_to_yaw=0., inference_start_idx=30,
+                  inference_end_idx=60):
     # Load one or multiple images
     gt_images = get_ground_truth_images(folder_path, 1, image_size, device)
 
     yaw_and_pitches = np.load(os.path.join(folder_path, 'yaw_and_pitches.npy'))
     # Inference poses:
-    img_yaws = [yaw_and_pitches[0][0]] + list(yaw_and_pitches[30:60, 0])
-    img_pitches = [yaw_and_pitches[0][1]] + list(yaw_and_pitches[30:60, 1])
+    img_yaws = [yaw_and_pitches[0][0]] + list(yaw_and_pitches[inference_start_idx:inference_end_idx, 0])
+    img_pitches = [yaw_and_pitches[0][1]] + list(yaw_and_pitches[inference_start_idx:inference_end_idx, 1])
      # Flip the - .5 Pi if the objects are reversed
     image_h_means = [-yaw_from_renderer + (math.pi * 0.75) + (0.5 * math.pi) + add_to_yaw for yaw_from_renderer in img_yaws]
     image_v_means = [(math.pi / 2 * 85 / 90) - pitch_from_renderer for pitch_from_renderer in img_pitches]
@@ -308,7 +309,9 @@ def main(opt, device):
             max_batch_size=opt.max_batch_size,
             lock_view_dependence=lock_view_dependence,
             use_view_lock_for_optimization=opt.use_view_lock_for_optimization,
-            add_to_yaw=opt.add_to_yaw
+            add_to_yaw=opt.add_to_yaw,
+            inference_start_idx=opt.inference_start_idx,
+            inference_end_idx=opt.inference_end_idx
         )
 
 
@@ -326,6 +329,8 @@ if __name__ == '__main__':
     parser.add_argument('--use_view_lock_for_optimization', action='store_true')
     parser.add_argument('--change_yaw', action='store_true')
     parser.add_argument('--add_to_yaw', type=float, default=0.)
+    parser.add_argument('--inference_start_idx', type=int, default=30)
+    parser.add_argument('--inference_end_idx', type=int, default=60)
 
     input_args = parser.parse_args()
     Path(input_args.output_dir).mkdir(parents=True, exist_ok=True)
