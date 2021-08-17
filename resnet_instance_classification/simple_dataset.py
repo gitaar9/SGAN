@@ -29,10 +29,10 @@ class SimpleShapenetRecognitionDataset(Dataset):
         )
 
     def load_data(self, root_dir, extra_root_dir=None, start_idx=0, amount_images=30, amount_extra_images=0):
-        # if amount_images == 30:
-        #     paths = []
-        # else:
-        paths = self.load_img_by_idx(root_dir, range(start_idx, start_idx + amount_images), 'rgb')
+        if amount_images == 30:
+            paths = []
+        else:
+            paths = self.load_img_by_idx(root_dir, range(start_idx, start_idx + amount_images), 'rgb')
         if extra_root_dir is not None and amount_extra_images > 0:
             paths.extend(self.load_img_by_idx(
                 extra_root_dir,
