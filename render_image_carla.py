@@ -17,7 +17,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('path', type=str)
-parser.add_argument('--seeds', nargs='+', default=[0, 1, 2])
+parser.add_argument('--seeds', nargs='+', default=[5,6])
 parser.add_argument('--output_dir', type=str, default='images')
 parser.add_argument('--batch_size', type=int, default=1)
 parser.add_argument('--max_batch_size', type=int, default=2400000)
@@ -69,13 +69,13 @@ yaw_from_renderer = -math.pi/4
 pitch_from_renderer = math.radians(35)
 
 # new for testing shapenetcars_no_mirror_v3
-yaw_from_renderer = 2.8194970895847584
-yaw_from_renderer = math.pi
-pitch_from_renderer = 0.0014992612891733656
+yaw_from_renderer = 2.66242184
+# yaw_from_renderer = math.pi
+pitch_from_renderer = 0.10832326
 
 
 curriculum['v_mean'] = (math.pi / 2 * 85 / 90) - pitch_from_renderer
-curriculum['h_mean'] = -yaw_from_renderer + (math.pi * 0.75) + (0.5 * math.pi) + (-2.3)  # The last term is specific for shapenetcars_no_mirror_v3
+curriculum['h_mean'] = -yaw_from_renderer + (math.pi * 0.75) + (0.5 * math.pi) + (3.03)  # The last term is specific for shapenetcars_no_mirror_v3
 
 print(f"Pi-GAN space v_mean: {curriculum['v_mean']}, h_mean: {curriculum['h_mean']}")
 
