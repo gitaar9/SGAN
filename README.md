@@ -92,3 +92,58 @@ Need to clean this up. Let me know if you want the messy code.
 ### Training Tips
 
 Training has been tested to work well on either two RTX 6000's or one RTX 8000. Training on a smaller GPU might work fine, but it's also possible you'll encounter instability, especially at higher resolutions. Bubbles and artifacts that suddenly appear, or blurring in the tilted angles, are signs that training destabilized. This can usually be mitigated by training with a larger batch size or by reducing the learning rate.
+
+
+
+### Files
+The discriminators, generators, and siren folders contain files I changed very little from the original implementation.
+Jobscripts contains all the jobscripts I used to run the experiments on the peregrine cluster.
+
+**calculate_simm.py:**
+A script I used for preliminary evaluation of novel view synthesis quality.
+
+**curriculums.py:**
+Contains the settings for the different experiments.
+
+**datasets.py:**
+Dataloader etc. for ShapeNet, CARLA and legacy datasets.
+
+**eval_metrics.py:**
+The evaluation script used for the final results.
+
+**fid_evaluation.py:**
+Outdated evaluation script
+
+**graf_metrics.py:**
+Script to perform the eval_metrics.py evaluation on the GRAF model results.
+
+**inverse_render_dataset.py:**
+Generate novel views for simm evaluation.
+
+**inverse_render_dataset_creation.py:**
+This script generates novel views for dataset that can be used for the data augmentation experiments.
+
+**mirror_train.py:**
+My version of train.py with a symmetry-based loss.
+
+**plot_results.py:**
+A script to download log files from peregrine and plot the results.
+
+**render_image_carla.py:**
+Render an image of a random latent code using a trained generator.
+
+**render_video_carla.py:**
+Render a video of a random latent code using a trained generator.
+
+**resnet_instance_recognition.py:**
+Script to train the resnet classifier for the data augmentation experiments.
+
+**train.py:**
+Original training script without the symmetry-based loss.
+
+**try_3d_plotting.py:**
+Script I used for the creation of some plots and getting a grasp of NeRF.
+
+**resnet_instance_classification/simple_dataset.py:**
+Dataloaders for the resnet_instance_recognition.py script.
+
