@@ -95,8 +95,9 @@ Training has been tested to work well on either two RTX 6000's or one RTX 8000. 
 
 
 
-### Files
+## Files
 The discriminators, generators, and siren folders contain files I changed very little from the original implementation.
+
 Jobscripts contains all the jobscripts I used to run the experiments on the peregrine cluster.
 
 **calculate_simm.py:**
