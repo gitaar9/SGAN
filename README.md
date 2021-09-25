@@ -1,7 +1,5 @@
 # π-GAN Prerelease Code
 
-**This code has not yet been publicly released. PLEASE DO NOT SHARE**
-
 ### Training a Model
 
 The main training script can be found in train.py, and may be called via cli.
